@@ -1,0 +1,30 @@
+; labels
+al  $c003 .palette
+al  $c023 .mul16x8_procedure
+al  $c029 .mul16x8_doAdd
+al  $c032 .mul16x8_loop
+al  $c036 .mul16x8_enterLoop
+al  $c03d .multiply_eightbit
+al  $c04b .mul_loop
+al  $c04d .mul_mod
+al  $c04f .mul_skip
+al  $c058 .mul_end
+al  $c05a .initeightbitmul_multiply_eightbit2
+al  $c05b .NMI
+al  $c069 .IRQ
+al  $c06a .InitScreen
+al  $c076 .InitScreen_forloop6
+al  $c07a .InitScreen_forloop23
+al  $c091 .InitScreen_forloopcounter25
+al  $c099 .InitScreen_loopdone32
+al  $c0a1 .InitScreen_loopdone33
+al  $c0a5 .InitScreen_fill34
+al  $c0b9 .InitScreen_PPUDump35
+al  $c0c5 .block1
+al  $c0d9 .vblankwait1
+al  $c0de .clrmem
+al  $c0fc .vblankwait2
+al  $c10d .MainProgram_LoadPalette36
+al  $fffa .StartBlockFFFA
+al  $10000 .EndBlockFFFA
+; breakpoints
