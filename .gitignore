@@ -17,3 +17,7 @@ NES-ca65-example-NES1/example_fceux_symbols.py
 NES-ca65-example-NES1/readme.md
 NES-ca65-example-NES1/sprite.chr
 *.nes
+*.txt
+*.dbg
+*.o
+*.py

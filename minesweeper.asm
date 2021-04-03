@@ -34,7 +34,7 @@ JOYPAD2		= $4017
 	.code
 		.proc nmi
 				rti
-		.end_proc
+		.endproc
 
 		.proc reset
 				sei ; disable interrupts
@@ -47,14 +47,14 @@ JOYPAD2		= $4017
 				stx APUSTATUS ; APUSTATUS = 0
 
 				;; PPU warmup, wait two frames, plus a third later.
-				bit PPUSTATUS
+:				bit PPUSTATUS
 				bpl :-
-				bit PPUSTATUS
+:				bit PPUSTATUS
 				bpl :-
 
 				;; Zero ram
 				txa
-				sta $000, x
+:				sta $000, x
         sta $100, x
         sta $200, x
         sta $300, x
@@ -66,7 +66,7 @@ JOYPAD2		= $4017
         bne :-
 
 				;; Third frame mentioned earlier
-				bit PPUSTATUS
+:				bit PPUSTATUS
 				bpl :-
 
 				;; Beeping program
@@ -80,8 +80,8 @@ JOYPAD2		= $4017
 				sta $4000
 				forever:
 					jmp forever
-		.end_proc
+		.endproc
 
 		.proc irq
 				rti
-		.end_proc
+		.endproc
