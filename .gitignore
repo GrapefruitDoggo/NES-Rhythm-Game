@@ -21,3 +21,4 @@ NES-ca65-example-NES1/sprite.chr
 *.dbg
 *.o
 *.py
+*.nl
