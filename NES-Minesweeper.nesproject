@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <nesicideproject addon-uris="" version="0.4" target="nes" title="NES-Minesweeper">
- <properties compilerincludepaths="-I ." sourcefilename="project_data.s" cartridgesavestatename="" linkeradditionaloptions="" linkeradditionaldependencies="" assembleradditionaloptions="" customrulefiles="" outputname="hello_world" compilerdefinedsymbols="" headerfilename="project_data.h" linkeroutputname="hello_world.prg" assemblerincludepaths="-I ." linkeroutputbasepath="obj/nes" sourcesearchpaths="" assemblerdefinedsymbols="" chrromoutputbasepath="obj/nes" debuginfoname="hello_world.dbg" chrromoutputname="hello_world.chr" cartridgeoutputname="hello_world.nes" linkerconfigfile="nes.ini" chrrom="1" outputbasepath="obj/nes" compileradditionaloptions="">
+ <properties compilerincludepaths="" sourcefilename="project_data.s" cartridgesavestatename="nes-minesweeper.sav" linkeradditionaloptions="" linkeradditionaldependencies="" assembleradditionaloptions="" customrulefiles="famitone2.mk" outputname="nes-minesweeper" compilerdefinedsymbols="" headerfilename="project_data.h" linkeroutputname="nes-minesweeper.prg" assemblerincludepaths="" linkeroutputbasepath="." sourcesearchpaths="/Applications/nesicide.app/Contents/MacOS/cc65/libsrc/nes;/Applications/nesicide.app/Contents/MacOS/cc65/libsrc" assemblerdefinedsymbols="" chrromoutputbasepath="." debuginfoname="nes-minesweeper.dbg" chrromoutputname="nes-minesweeper.chr" cartridgeoutputname="nes-minesweeper.nes" linkerconfigfile="" chrrom="1" outputbasepath="." compileradditionaloptions="">
   <tileproperties/>
   <palette>
    <entry g="102" index="0" b="102" r="102"/>
@@ -90,26 +90,18 @@
    <tiles/>
   </primitives>
   <sources>
-   <source name="src/main.s" uuid="{85df0f74-f09f-439c-8488-3e00605a5140}" path="src/main.s">
+   <source name="famitone2.inc" uuid="{9f383844-11d0-4a0a-b7e5-7ef5e0c02887}" path="famitone2.inc">
     <properties includeinbuild="1"/>
    </source>
-   <source name="src/nes.h" uuid="{5da23e19-d3ce-4ed5-8923-41a2b561b40d}" path="src/nes.h">
-    <properties includeinbuild="1"/>
-   </source>
-   <source name="header.s" uuid="{98802cd6-243e-11e9-ab14-d663bd873d93}" path="header.s">
-    <properties includeinbuild="1"/>
+   <source name="famitone2.s" uuid="{cc2e4a98-ef0b-45ba-a995-516a90d50c93}" path="famitone2.s">
+    <properties includeinbuild="0"/>
    </source>
   </sources>
   <binaryfiles>
-   <binaryfile name="tilesets/gamegfx.png" ysize="128" xsize="128" uuid="{b2dc5fc9-a56d-4e66-97bf-6b3cc3668587}" path="tilesets/gamegfx.png"/>
-   <binaryfile name="tilesets/titlegfx.png" ysize="128" xsize="128" uuid="{bdb3ec5c-e001-4f0d-9bbb-296914f99997}" path="tilesets/titlegfx.png"/>
+   <binaryfile name="assets/tiles/game_tiles_palette.pal" ysize="24" xsize="128" uuid="{bae4615f-d63b-4d72-8597-ced7370508a7}" path="assets/tiles/game_tiles_palette.pal"/>
+   <binaryfile name="assets/tiles/game_tiles.chr" ysize="128" xsize="256" uuid="{975ef73b-c948-4e15-a011-b9717851adca}" path="assets/tiles/game_tiles.chr"/>
   </binaryfiles>
-  <graphicsbanks>
-   <graphicsbank name="bank0" size="8192" uuid="{cb39773a-0926-42ac-814f-9b3f12664f16}">
-    <graphicitem uuid="{bdb3ec5c-e001-4f0d-9bbb-296914f99997}"/>
-    <graphicitem uuid="{b2dc5fc9-a56d-4e66-97bf-6b3cc3668587}"/>
-   </graphicsbank>
-  </graphicsbanks>
+  <graphicsbanks/>
   <sounds>
    <musics/>
   </sounds>
