@@ -1,114 +1,108 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<nesicideproject version="0.4" target="nes" addon-uris="" title="NES-Minesweeper">
- <properties linkerconfigfile="nes.ini" customrulefiles="" compilerincludepaths="-I ." outputname="hello_world" cartridgesavestatename="" chrrom="1" chrromoutputbasepath="obj/nes" sourcesearchpaths="" cartridgeoutputname="hello_world.nes" assemblerdefinedsymbols="" assemblerincludepaths="-I ." linkeroutputbasepath="obj/nes" sourcefilename="project_data.s" outputbasepath="obj/nes" compileradditionaloptions="" chrromoutputname="hello_world.chr" linkeroutputname="hello_world.prg" linkeradditionaloptions="" assembleradditionaloptions="" debuginfoname="hello_world.dbg" linkeradditionaldependencies="" compilerdefinedsymbols="" headerfilename="project_data.h">
+<nesicideproject addon-uris="" version="0.4" target="nes" title="NES-Minesweeper">
+ <properties compilerincludepaths="-I ." sourcefilename="project_data.s" cartridgesavestatename="" linkeradditionaloptions="" linkeradditionaldependencies="" assembleradditionaloptions="" customrulefiles="" outputname="hello_world" compilerdefinedsymbols="" headerfilename="project_data.h" linkeroutputname="hello_world.prg" assemblerincludepaths="-I ." linkeroutputbasepath="obj/nes" sourcesearchpaths="" assemblerdefinedsymbols="" chrromoutputbasepath="obj/nes" debuginfoname="hello_world.dbg" chrromoutputname="hello_world.chr" cartridgeoutputname="hello_world.nes" linkerconfigfile="nes.ini" chrrom="1" outputbasepath="obj/nes" compileradditionaloptions="">
   <tileproperties/>
   <palette>
-   <entry g="102" b="102" r="102" index="0"/>
-   <entry g="42" b="136" r="0" index="1"/>
-   <entry g="18" b="167" r="20" index="2"/>
-   <entry g="0" b="164" r="59" index="3"/>
-   <entry g="0" b="126" r="92" index="4"/>
-   <entry g="0" b="64" r="110" index="5"/>
-   <entry g="6" b="0" r="108" index="6"/>
-   <entry g="29" b="0" r="86" index="7"/>
-   <entry g="53" b="0" r="51" index="8"/>
-   <entry g="72" b="0" r="11" index="9"/>
-   <entry g="82" b="0" r="0" index="10"/>
-   <entry g="79" b="8" r="0" index="11"/>
-   <entry g="64" b="77" r="0" index="12"/>
-   <entry g="0" b="0" r="0" index="13"/>
-   <entry g="0" b="0" r="0" index="14"/>
-   <entry g="0" b="0" r="0" index="15"/>
-   <entry g="173" b="173" r="173" index="16"/>
-   <entry g="95" b="217" r="21" index="17"/>
-   <entry g="64" b="255" r="66" index="18"/>
-   <entry g="39" b="254" r="117" index="19"/>
-   <entry g="26" b="204" r="160" index="20"/>
-   <entry g="30" b="123" r="183" index="21"/>
-   <entry g="49" b="32" r="181" index="22"/>
-   <entry g="78" b="0" r="153" index="23"/>
-   <entry g="109" b="0" r="107" index="24"/>
-   <entry g="135" b="0" r="56" index="25"/>
-   <entry g="147" b="0" r="12" index="26"/>
-   <entry g="143" b="50" r="0" index="27"/>
-   <entry g="124" b="141" r="0" index="28"/>
-   <entry g="0" b="0" r="0" index="29"/>
-   <entry g="0" b="0" r="0" index="30"/>
-   <entry g="0" b="0" r="0" index="31"/>
-   <entry g="254" b="255" r="255" index="32"/>
-   <entry g="176" b="255" r="100" index="33"/>
-   <entry g="144" b="255" r="146" index="34"/>
-   <entry g="118" b="255" r="198" index="35"/>
-   <entry g="106" b="255" r="243" index="36"/>
-   <entry g="110" b="204" r="254" index="37"/>
-   <entry g="129" b="112" r="254" index="38"/>
-   <entry g="158" b="34" r="234" index="39"/>
-   <entry g="190" b="0" r="188" index="40"/>
-   <entry g="216" b="0" r="136" index="41"/>
-   <entry g="228" b="48" r="92" index="42"/>
-   <entry g="224" b="130" r="69" index="43"/>
-   <entry g="205" b="222" r="72" index="44"/>
-   <entry g="79" b="79" r="79" index="45"/>
-   <entry g="0" b="0" r="0" index="46"/>
-   <entry g="0" b="0" r="0" index="47"/>
-   <entry g="254" b="255" r="255" index="48"/>
-   <entry g="223" b="255" r="192" index="49"/>
-   <entry g="210" b="255" r="211" index="50"/>
-   <entry g="200" b="255" r="232" index="51"/>
-   <entry g="194" b="255" r="251" index="52"/>
-   <entry g="196" b="234" r="254" index="53"/>
-   <entry g="204" b="197" r="254" index="54"/>
-   <entry g="216" b="165" r="247" index="55"/>
-   <entry g="229" b="148" r="228" index="56"/>
-   <entry g="239" b="150" r="207" index="57"/>
-   <entry g="244" b="171" r="189" index="58"/>
-   <entry g="243" b="204" r="179" index="59"/>
-   <entry g="235" b="242" r="181" index="60"/>
-   <entry g="184" b="184" r="184" index="61"/>
-   <entry g="0" b="0" r="0" index="62"/>
-   <entry g="0" b="0" r="0" index="63"/>
+   <entry g="102" index="0" b="102" r="102"/>
+   <entry g="42" index="1" b="136" r="0"/>
+   <entry g="18" index="2" b="167" r="20"/>
+   <entry g="0" index="3" b="164" r="59"/>
+   <entry g="0" index="4" b="126" r="92"/>
+   <entry g="0" index="5" b="64" r="110"/>
+   <entry g="6" index="6" b="0" r="108"/>
+   <entry g="29" index="7" b="0" r="86"/>
+   <entry g="53" index="8" b="0" r="51"/>
+   <entry g="72" index="9" b="0" r="11"/>
+   <entry g="82" index="10" b="0" r="0"/>
+   <entry g="79" index="11" b="8" r="0"/>
+   <entry g="64" index="12" b="77" r="0"/>
+   <entry g="0" index="13" b="0" r="0"/>
+   <entry g="0" index="14" b="0" r="0"/>
+   <entry g="0" index="15" b="0" r="0"/>
+   <entry g="173" index="16" b="173" r="173"/>
+   <entry g="95" index="17" b="217" r="21"/>
+   <entry g="64" index="18" b="255" r="66"/>
+   <entry g="39" index="19" b="254" r="117"/>
+   <entry g="26" index="20" b="204" r="160"/>
+   <entry g="30" index="21" b="123" r="183"/>
+   <entry g="49" index="22" b="32" r="181"/>
+   <entry g="78" index="23" b="0" r="153"/>
+   <entry g="109" index="24" b="0" r="107"/>
+   <entry g="135" index="25" b="0" r="56"/>
+   <entry g="147" index="26" b="0" r="12"/>
+   <entry g="143" index="27" b="50" r="0"/>
+   <entry g="124" index="28" b="141" r="0"/>
+   <entry g="0" index="29" b="0" r="0"/>
+   <entry g="0" index="30" b="0" r="0"/>
+   <entry g="0" index="31" b="0" r="0"/>
+   <entry g="254" index="32" b="255" r="255"/>
+   <entry g="176" index="33" b="255" r="100"/>
+   <entry g="144" index="34" b="255" r="146"/>
+   <entry g="118" index="35" b="255" r="198"/>
+   <entry g="106" index="36" b="255" r="243"/>
+   <entry g="110" index="37" b="204" r="254"/>
+   <entry g="129" index="38" b="112" r="254"/>
+   <entry g="158" index="39" b="34" r="234"/>
+   <entry g="190" index="40" b="0" r="188"/>
+   <entry g="216" index="41" b="0" r="136"/>
+   <entry g="228" index="42" b="48" r="92"/>
+   <entry g="224" index="43" b="130" r="69"/>
+   <entry g="205" index="44" b="222" r="72"/>
+   <entry g="79" index="45" b="79" r="79"/>
+   <entry g="0" index="46" b="0" r="0"/>
+   <entry g="0" index="47" b="0" r="0"/>
+   <entry g="254" index="48" b="255" r="255"/>
+   <entry g="223" index="49" b="255" r="192"/>
+   <entry g="210" index="50" b="255" r="211"/>
+   <entry g="200" index="51" b="255" r="232"/>
+   <entry g="194" index="52" b="255" r="251"/>
+   <entry g="196" index="53" b="234" r="254"/>
+   <entry g="204" index="54" b="197" r="254"/>
+   <entry g="216" index="55" b="165" r="247"/>
+   <entry g="229" index="56" b="148" r="228"/>
+   <entry g="239" index="57" b="150" r="207"/>
+   <entry g="244" index="58" b="171" r="189"/>
+   <entry g="243" index="59" b="204" r="179"/>
+   <entry g="235" index="60" b="242" r="181"/>
+   <entry g="184" index="61" b="184" r="184"/>
+   <entry g="0" index="62" b="0" r="0"/>
+   <entry g="0" index="63" b="0" r="0"/>
   </palette>
  </properties>
  <inspectors>
   <symbolinspector/>
   <breakpoints/>
   <markers>
-   <marker endabsaddr="0" endaddr="0" state="0" startabsaddr="0" index="0" startaddr="0"/>
-   <marker endabsaddr="0" endaddr="0" state="0" startabsaddr="0" index="1" startaddr="0"/>
-   <marker endabsaddr="0" endaddr="0" state="0" startabsaddr="0" index="2" startaddr="0"/>
-   <marker endabsaddr="0" endaddr="0" state="0" startabsaddr="0" index="3" startaddr="0"/>
-   <marker endabsaddr="0" endaddr="0" state="0" startabsaddr="0" index="4" startaddr="0"/>
-   <marker endabsaddr="0" endaddr="0" state="0" startabsaddr="0" index="5" startaddr="0"/>
-   <marker endabsaddr="0" endaddr="0" state="0" startabsaddr="0" index="6" startaddr="0"/>
-   <marker endabsaddr="0" endaddr="0" state="0" startabsaddr="0" index="7" startaddr="0"/>
+   <marker startabsaddr="0" endabsaddr="0" endaddr="0" index="0" state="0" startaddr="0"/>
+   <marker startabsaddr="0" endabsaddr="0" endaddr="0" index="1" state="0" startaddr="0"/>
+   <marker startabsaddr="0" endabsaddr="0" endaddr="0" index="2" state="0" startaddr="0"/>
+   <marker startabsaddr="0" endabsaddr="0" endaddr="0" index="3" state="0" startaddr="0"/>
+   <marker startabsaddr="0" endabsaddr="0" endaddr="0" index="4" state="0" startaddr="0"/>
+   <marker startabsaddr="0" endabsaddr="0" endaddr="0" index="5" state="0" startaddr="0"/>
+   <marker startabsaddr="0" endabsaddr="0" endaddr="0" index="6" state="0" startaddr="0"/>
+   <marker startabsaddr="0" endabsaddr="0" endaddr="0" index="7" state="0" startaddr="0"/>
   </markers>
  </inspectors>
- <cartridge mirrorMode="0" fourScreen="0" mapperNumber="0" hasBatteryBackedRam="0"/>
+ <cartridge fourScreen="0" hasBatteryBackedRam="0" mirrorMode="0" mapperNumber="0"/>
  <project>
   <primitives>
    <attributetables/>
-   <tiles>
-    <tile grid="0" name="game_tiles" uuid="{5aeaafcf-c93e-46d6-b539-fafd463606d8}" attrtbl="" x="8" y="8">
-     <tileproperties/>
-     <tile><![CDATA[00000000000000000000000000000000]]></tile>
-     <attr><![CDATA[00]]></attr>
-    </tile>
-   </tiles>
+   <tiles/>
   </primitives>
   <sources>
-   <source name="src/main.s" path="src/main.s" uuid="{85df0f74-f09f-439c-8488-3e00605a5140}">
+   <source name="src/main.s" uuid="{85df0f74-f09f-439c-8488-3e00605a5140}" path="src/main.s">
     <properties includeinbuild="1"/>
    </source>
-   <source name="src/nes.h" path="src/nes.h" uuid="{5da23e19-d3ce-4ed5-8923-41a2b561b40d}">
+   <source name="src/nes.h" uuid="{5da23e19-d3ce-4ed5-8923-41a2b561b40d}" path="src/nes.h">
     <properties includeinbuild="1"/>
    </source>
-   <source name="header.s" path="header.s" uuid="{98802cd6-243e-11e9-ab14-d663bd873d93}">
+   <source name="header.s" uuid="{98802cd6-243e-11e9-ab14-d663bd873d93}" path="header.s">
     <properties includeinbuild="1"/>
    </source>
   </sources>
   <binaryfiles>
-   <binaryfile name="tilesets/gamegfx.png" ysize="128" path="tilesets/gamegfx.png" uuid="{b2dc5fc9-a56d-4e66-97bf-6b3cc3668587}" xsize="128"/>
-   <binaryfile name="tilesets/titlegfx.png" ysize="128" path="tilesets/titlegfx.png" uuid="{bdb3ec5c-e001-4f0d-9bbb-296914f99997}" xsize="128"/>
+   <binaryfile name="tilesets/gamegfx.png" ysize="128" xsize="128" uuid="{b2dc5fc9-a56d-4e66-97bf-6b3cc3668587}" path="tilesets/gamegfx.png"/>
+   <binaryfile name="tilesets/titlegfx.png" ysize="128" xsize="128" uuid="{bdb3ec5c-e001-4f0d-9bbb-296914f99997}" path="tilesets/titlegfx.png"/>
   </binaryfiles>
   <graphicsbanks>
    <graphicsbank name="bank0" size="8192" uuid="{cb39773a-0926-42ac-814f-9b3f12664f16}">
