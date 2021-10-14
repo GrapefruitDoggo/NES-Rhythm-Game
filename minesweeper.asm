@@ -69,6 +69,10 @@ JOYPAD2		= $4017
 :				bit PPUSTATUS
 				bpl :-
 
+				;; Screen colour program
+				lda %11100000
+				sta $2001
+
 				;; Beeping program
 				lda #$01		; enable pulse 1
 				sta $4015
