@@ -96,6 +96,9 @@
    <source name="famitone2.s" uuid="{cc2e4a98-ef0b-45ba-a995-516a90d50c93}" path="famitone2.s">
     <properties includeinbuild="0"/>
    </source>
+   <source name="src/iNES.s/iNES" uuid="{32259a0b-d892-4ab9-8e4a-bea32813e8ca}" path="src/iNES.s/iNES">
+    <properties includeinbuild="1"/>
+   </source>
   </sources>
   <binaryfiles>
    <binaryfile name="assets/tiles/game_tiles_palette.pal" ysize="24" xsize="128" uuid="{bae4615f-d63b-4d72-8597-ced7370508a7}" path="assets/tiles/game_tiles_palette.pal"/>
