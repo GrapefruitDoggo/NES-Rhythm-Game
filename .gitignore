@@ -22,3 +22,4 @@ NES-ca65-example-NES1/sprite.chr
 *.o
 *.py
 *.nl
+.DS_Store
