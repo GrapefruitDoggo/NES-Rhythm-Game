@@ -2,7 +2,7 @@
 .feature        c_comments      /* allow this style of comment */
 
 .segment "IMG"
-.incbin "../assets/tiles/game_tiles.chr"
+.incbin "../assets/tiles/HelloWorld.chr"
 
 .include "./define/header.asm"
 .include "./lib/utils.asm"
