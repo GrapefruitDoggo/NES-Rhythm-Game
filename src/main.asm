@@ -32,15 +32,3 @@ game_loop:
     not_240:
 
     jmp game_loop
-© 2021 GitHub, Inc.
-Terms
-Privacy
-Security
-Status
-Docs
-Contact GitHub
-Pricing
-API
-Training
-Blog
-About
