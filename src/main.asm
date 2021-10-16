@@ -2,17 +2,17 @@
 .feature        c_comments      /* allow this style of comment */
 
 .segment "IMG"
-.incbin "../img/HelloWorld.chr"
+.incbin "../assets/tiles/game_tiles.chr"
 
-.include "./def/header.asm"
+.include "./define/header.asm"
 .include "./lib/utils.asm"
 .include "./lib/gamepad.asm"
-.include "./def/ppu.asm"
-.include "./def/palette.asm"
+.include "./lib/ppu.asm"
+.include "./define/palette.asm"
 
-.include "./vectors/irq.asm"              ; not currently using irq code, but it must be defined
-.include "./vectors/reset.asm"            ; code and macros related to pressing the reset button
-.include "./vectors/nmi.asm"
+.include "./interrupt/irq.asm"              ; not currently using irq code, but it must be defined
+.include "./interrupt/reset.asm"            ; code and macros related to pressing the reset button
+.include "./interrupt/nmi.asm"
 
 
 game_loop:
