@@ -2,6 +2,7 @@
     nmi_ready: .res 1
     palette_init: .res 1
     scroll_y: .res 1
+    sprite_ID: .res 1
 
 .segment "CODE"
 
@@ -18,7 +19,14 @@ nmi:
     ; call the oam dma with a macro
     jsr oam_dma
 
-    printf_nmi "HELLO WORLD!", 80, 96
+    ldx #$00
+render_loop:
+    lda board, x
+    sta sprite_ID
+    printx_nmi .string(sprite_ID)
+    inx
+    bne render_loop
+
 
     lda PPU_STATUS ; $2002
 

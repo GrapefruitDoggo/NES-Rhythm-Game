@@ -245,7 +245,7 @@ OAM_DMA = $4014	; aaaa aaaa	OAM DMA high address
 .endproc
 
 .proc oam_dma
-    set PPU_CTRL, #%10010000; PPU_CTRL_NMI_ENABLE
+    set PPU_CTRL, #%10010000 ; PPU_CTRL_NMI_ENABLE
 ;=============================================
 ; PPU_MASK_EMPH_BLUE          = %10000000
 ; PPU_MASK_EMPH_GREEN         = %01000000

@@ -1,8 +1,11 @@
 .linecont       +               ; Allow line continuations
 .feature        c_comments      /* allow this style of comment */
 
+.segment "VARS"
+    board: .res 100
+
 .segment "IMG"
-.incbin "../assets/tiles/HelloWorld.chr"
+.incbin "../assets/tiles/game_tiles.chr"
 
 .include "./define/header.asm"
 .include "./lib/utils.asm"
@@ -23,7 +26,7 @@ game_loop:
 
     set nmi_ready, #1
 
-    inc scroll_y
+    ;inc scroll_y
     lda scroll_y
 
     cmp #240
