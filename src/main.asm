@@ -17,6 +17,13 @@
 .include "./interrupt/reset.asm"            ; code and macros related to pressing the reset button
 .include "./interrupt/nmi.asm"
 
+gen_board:
+    ldx #$00
+    lda #$01
+    x_loop:
+        sta board, x
+        inx
+        bne x_loop
 
 game_loop:
     lda nmi_ready
