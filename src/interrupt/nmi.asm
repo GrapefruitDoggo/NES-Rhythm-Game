@@ -3,6 +3,7 @@
     palette_init: .res 1
     scroll_y: .res 1
     sprite_ID: .res 1
+    row_var: .res 1
 
 .segment "CODE"
 
@@ -19,14 +20,22 @@ nmi:
     ; call the oam dma with a macro
     jsr oam_dma
 
+;    ldx #$00
+;render_loop:
+;    stx row_var
+;
+;    lda board, x
+;    sta sprite_ID
+;    draw_sprite_nmi sprite_ID, 4, 4
+;    inx
+;    bne render_loop
     ldx #$00
-render_loop:
+    stx row_var
+
     lda board, x
     sta sprite_ID
-    printx_nmi .string(sprite_ID)
-    inx
-    bne render_loop
 
+    draw_sprite_nmi sprite_ID, 0, 8
 
     lda PPU_STATUS ; $2002
 

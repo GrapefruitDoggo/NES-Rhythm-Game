@@ -19,7 +19,7 @@
 
 gen_board:
     ldx #$00
-    lda #$01
+    lda #$40
     x_loop:
         sta board, x
         inx
