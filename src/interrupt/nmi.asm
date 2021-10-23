@@ -2,8 +2,8 @@
     nmi_ready: .res 1
     palette_init: .res 1
     scroll_y: .res 1
-    sprite_ID: .res 1
-    row_var: .res 1
+    tile_ID: .res 1
+    board_pointer: .res 1
 
 .segment "CODE"
 
@@ -20,13 +20,10 @@ nmi:
     ; call the oam dma with a macro
     jsr oam_dma
 
-    ;lda board, x
-    ;sta sprite_ID
-
-    ;draw_sprite_nmi sprite_ID, 0, 0
-    ;draw_sprite_nmi sprite_ID, 16, 0
-    ;draw_sprite_nmi sprite_ID, 0, 16
-    ;draw_sprite_nmi sprite_ID, 16, 16
+    ;draw_tile_nmi tile_ID, #$00, #$00
+    ;draw_tile_nmi tile_ID, #$1f, #$00
+    ;draw_tile_nmi tile_ID, #$00, #$1d
+    ;draw_tile_nmi tile_ID, #$1f, #$1d
 
     jsr draw_board
 

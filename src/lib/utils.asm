@@ -34,12 +34,12 @@
 .endmacro
 
 ; this code will be called from the nmi
-.macro draw_sprite_nmi ID, COL, ROW ; 16, 4
+.macro draw_tile_nmi ID, COL, ROW ; 16, 4
     .local BYTE_OFFSET_HI
     .local BYTE_OFFSET_LO
 
-    BYTE_OFFSET_HI = ((ROW+1) * 32 + COL) / 256 + 32 ; (16 * 32 + 4) / 256 + 32
-    BYTE_OFFSET_LO = ((ROW+1) * 32 + COL) .mod 256
+    BYTE_OFFSET_HI = ((ROW) * 32 + COL) / 256 + 32 ; (16 * 32 + 4) / 256 + 32
+    BYTE_OFFSET_LO = ((ROW) * 32 + COL) .mod 256
 
     lda PPU_STATUS        ; PPU_STATUS = $2002
 
@@ -52,9 +52,11 @@
     sta PPU_DATA
 .endmacro
 
+; 2nd digit must always be even, when getting to x = #$ff, iny
 .proc draw_board
-    ldy #$00
+    ldy #$20
     ldx #$00
+    stx board_pointer         ; board_pointer will be used to cycle through the board, telling us which sprites to render
 
     render_loop:
         lda PPU_STATUS        ; PPU_STATUS = $2002
@@ -62,10 +64,30 @@
         sty PPU_ADDR          ; High byte
         stx PPU_ADDR          ; Low byte
 
+        ; here we're checking if the 2nd digit of x is about to be odd - if it is, we advance until it becomes even again
+        txa
+        and #%00011111
+        cmp #%00001111
+        bne continue_loop                  ; if the and op gave us #%00001111 (i.e. if whem we inx, x's 2nd digit will be odd), we run the code below
+            txa
+            adc #$0f
+            tax
+
+    continue_loop:
+        txs                   ; shove x into the stack so we can use board_pointer
+        ldx board_pointer
         lda board, x
         sta PPU_DATA
+        tsx
 
-        ;inx
+        inc board_pointer     ; if board_pointer is 0, we should eject ourselves out of the loop
+        beq board_end
+
+        inx
+        bne render_loop
+
         iny
-        beq render_loop
+        cmp #$24
+        bne render_loop
+    board_end:
 .endproc
