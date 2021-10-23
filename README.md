@@ -1,4 +1,3 @@
 # NES-Minesweeper
 
-NES Dev is hard, going on a haitus for now while I figure out what the heck I'm doing -\_-
-I'll probably make a proper read-me at some point in the future
+Project is back! I'm still not gonna make a proper readme, because nothing about my work ethic has changed! haha '>->
