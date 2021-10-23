@@ -20,22 +20,15 @@ nmi:
     ; call the oam dma with a macro
     jsr oam_dma
 
-;    ldx #$00
-;render_loop:
-;    stx row_var
-;
-;    lda board, x
-;    sta sprite_ID
-;    draw_sprite_nmi sprite_ID, 4, 4
-;    inx
-;    bne render_loop
-    ldx #$00
-    stx row_var
+    ;lda board, x
+    ;sta sprite_ID
 
-    lda board, x
-    sta sprite_ID
+    ;draw_sprite_nmi sprite_ID, 0, 0
+    ;draw_sprite_nmi sprite_ID, 16, 0
+    ;draw_sprite_nmi sprite_ID, 0, 16
+    ;draw_sprite_nmi sprite_ID, 16, 16
 
-    draw_sprite_nmi sprite_ID, 0, 8
+    jsr draw_board
 
     lda PPU_STATUS ; $2002
 

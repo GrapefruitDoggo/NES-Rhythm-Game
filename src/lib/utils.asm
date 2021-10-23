@@ -34,16 +34,12 @@
 .endmacro
 
 ; this code will be called from the nmi
-.macro draw_sprite_nmi ID, XPOS, YPOS ; 16, 4
-    .local ROW
-    .local COL
+.macro draw_sprite_nmi ID, COL, ROW ; 16, 4
     .local BYTE_OFFSET_HI
     .local BYTE_OFFSET_LO
 
-    ROW = YPOS / 8 ; 128 / 8 = 16
-    COL = XPOS / 8 ; 32 /  8  = 4
-    BYTE_OFFSET_HI = (ROW * 32 + COL) / 256 + 32 ; (16 * 32 + 4) / 256 + 20
-    BYTE_OFFSET_LO = (ROW * 32 + COL) .mod 256
+    BYTE_OFFSET_HI = ((ROW+1) * 32 + COL) / 256 + 32 ; (16 * 32 + 4) / 256 + 32
+    BYTE_OFFSET_LO = ((ROW+1) * 32 + COL) .mod 256
 
     lda PPU_STATUS        ; PPU_STATUS = $2002
 
@@ -55,3 +51,21 @@
     lda ID
     sta PPU_DATA
 .endmacro
+
+.proc draw_board
+    ldy #$00
+    ldx #$00
+
+    render_loop:
+        lda PPU_STATUS        ; PPU_STATUS = $2002
+
+        sty PPU_ADDR          ; High byte
+        stx PPU_ADDR          ; Low byte
+
+        lda board, x
+        sta PPU_DATA
+
+        ;inx
+        iny
+        beq render_loop
+.endproc
