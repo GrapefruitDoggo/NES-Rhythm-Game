@@ -2,7 +2,10 @@
 .feature        c_comments      /* allow this style of comment */
 
 .segment "VARS"
-    board: .res 100
+    level: .res $400
+
+.segment "ZEROPAGE"
+    level_pointer: .res 1
 
 .segment "IMG"
 .incbin "../assets/tiles/game_tiles.chr"
@@ -12,18 +15,30 @@
 .include "./lib/gamepad.asm"
 .include "./lib/ppu.asm"
 .include "./define/palette.asm"
+.include "./define/level.asm"
 
 .include "./interrupt/irq.asm"              ; not currently using irq code, but it must be defined
 .include "./interrupt/reset.asm"            ; code and macros related to pressing the reset button
 .include "./interrupt/nmi.asm"
 
-gen_board:
+gen_screen:
+    lda #$c0
+    sta scroll_x
+
     ldx #$00
-    lda #$40
-    x_loop:
-        sta board, x
+    gen_screen_loop:
+        lda minesweeper, x
+        sta $0300, x
+        lda minesweeper+$0100, x
+        sta $0400, x
+        lda minesweeper+$0200, x
+        sta $0500, x
+        lda minesweeper+$0300, x
+        sta $0600, x
         inx
-        bne x_loop
+        bne gen_screen_loop
+
+        jsr draw_screen
 
 game_loop:
     lda nmi_ready
@@ -31,14 +46,6 @@ game_loop:
 
     jsr set_gamepad
 
-    set nmi_ready, #1
-
-    ;inc scroll_y
-    lda scroll_y
-
-    cmp #240
-    bne not_240
-        set scroll_y, #0
-    not_240:
+    set nmi_ready, #$01
 
     jmp game_loop

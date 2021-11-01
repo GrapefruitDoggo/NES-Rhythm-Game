@@ -17,7 +17,7 @@
 ; ||||+---- 1: Ignore mirroring control or above mirroring bit; instead provide four-screen VRAM
 ; ++++----- Lower nybble of mapper number
 ;============================================================================================
-  .byte %00000001                   ; NROM mapper 0, other mappers have more complicated values here
+  .byte %00000000                   ; NROM mapper 0, other mappers have more complicated values here
   .byte $0, $0, $0, $0, $0, $0
 ; this is about as basic as the header gets.
 

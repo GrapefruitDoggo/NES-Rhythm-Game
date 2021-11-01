@@ -1,6 +1,6 @@
 .segment "ROMDATA"
 palette_background:
-.byte $0f, $28, $05, $25
+.byte $0f, $28, $05, $26
 .byte $0f, $00, $10, $20
 .byte $0f, $0f, $0f, $0f
 .byte $0f, $0f, $0f, $0f

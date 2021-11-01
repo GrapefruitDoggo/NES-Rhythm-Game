@@ -1,9 +1,9 @@
 .segment "ZEROPAGE"
     nmi_ready: .res 1
     palette_init: .res 1
-    scroll_y: .res 1
+    scroll_x: .res 1
     tile_ID: .res 1
-    board_pointer: .res 1
+    screen_pointer: .res 1
 
 .segment "CODE"
 
@@ -20,17 +20,12 @@ nmi:
     ; call the oam dma with a macro
     jsr oam_dma
 
-    ;draw_tile_nmi tile_ID, #$00, #$00
-    ;draw_tile_nmi tile_ID, #$1f, #$00
-    ;draw_tile_nmi tile_ID, #$00, #$1d
-    ;draw_tile_nmi tile_ID, #$1f, #$1d
-
-    jsr draw_board
+    ;draw_board
 
     lda PPU_STATUS ; $2002
 
+    set PPU_SCROLL, scroll_x
     set PPU_SCROLL, #0
-    set PPU_SCROLL, scroll_y
 
     set nmi_ready, #0
 
