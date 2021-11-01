@@ -2,7 +2,7 @@
 .feature        c_comments      /* allow this style of comment */
 
 .segment "VARS"
-    level: .res $400
+    level: .res $3C0
 
 .segment "IMG"
 .incbin "../assets/tiles/game_tiles.chr"

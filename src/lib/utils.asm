@@ -111,6 +111,6 @@
         sta PPU_DATA
 
         inx
-        cpx #$cf
+        cpx #$bf
         bne render_loop_4
 .endproc
