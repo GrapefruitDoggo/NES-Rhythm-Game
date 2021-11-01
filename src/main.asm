@@ -25,6 +25,7 @@ gen_screen:
     sta scroll_x
 
     jsr draw_background
+    jsr draw_attribute
 
 game_loop:
     lda nmi_ready

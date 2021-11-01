@@ -114,3 +114,24 @@
         cpx #$bf
         bne render_loop_4
 .endproc
+
+.proc draw_attribute
+    jsr wait_for_vblank
+
+    lda PPU_STATUS        ; PPU_STATUS = $2002
+
+    lda #$23
+    sta PPU_ADDR          ; High byte
+    lda #$c0
+    sta PPU_ADDR          ; Low byte
+
+    ldx #$00
+
+    attribute_loop_1:
+        lda attribute, x
+        sta PPU_DATA
+
+        inx
+        cpx #$40
+        bne attribute_loop_1
+.endproc
