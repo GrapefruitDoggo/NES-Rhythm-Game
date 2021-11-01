@@ -4,9 +4,6 @@
 .segment "VARS"
     level: .res $400
 
-.segment "ZEROPAGE"
-    level_pointer: .res 1
-
 .segment "IMG"
 .incbin "../assets/tiles/game_tiles.chr"
 
