@@ -47,7 +47,7 @@
     sta PPU_DATA
 .endmacro
 
-.proc draw_screen
+.proc draw_background
     jsr wait_for_vblank
 
     ldy #$20
@@ -59,7 +59,7 @@
     stx PPU_ADDR          ; Low byte
 
     render_loop_1:
-        lda $0300, x
+        lda minesweeper, x
         sta PPU_DATA
 
         inx
@@ -75,7 +75,7 @@
     stx PPU_ADDR          ; Low byte
 
     render_loop_2:
-        lda $0400, x
+        lda minesweeper+$0100, x
         sta PPU_DATA
 
         inx
@@ -91,7 +91,7 @@
     stx PPU_ADDR          ; Low byte
 
     render_loop_3:
-        lda $0500, x
+        lda minesweeper+$0200, x
         sta PPU_DATA
 
         inx
@@ -107,7 +107,7 @@
     stx PPU_ADDR          ; Low byte
 
     render_loop_4:
-        lda $0600, x
+        lda minesweeper+$0300, x
         sta PPU_DATA
 
         inx

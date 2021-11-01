@@ -20,8 +20,6 @@ nmi:
     ; call the oam dma with a macro
     jsr oam_dma
 
-    ;draw_board
-
     lda PPU_STATUS ; $2002
 
     set PPU_SCROLL, scroll_x
