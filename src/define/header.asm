@@ -13,8 +13,8 @@
 ; |||| |||              1: vertical (horizontal arrangement) (CIRAM A10 = PPU A10)
 ; |||| ||+-- 1: Cartridge contains battery-backed PRG RAM ($6000-7FFF) or other persistent memory
 ; |||| |+--- 1: 512-byte trainer at $7000-$71FF (stored before PRG data)
+; |||| +---- 1: Ignore mirroring control or above mirroring bit; instead provide four-screen VRAM
 ; ||||
-; ||||+---- 1: Ignore mirroring control or above mirroring bit; instead provide four-screen VRAM
 ; ++++----- Lower nybble of mapper number
 ;============================================================================================
   .byte %00000000                   ; NROM mapper 0, other mappers have more complicated values here
