@@ -34,7 +34,7 @@
 .endmacro
 
 ; this code will be called from the nmi
-.macro draw_tile_nmi ID, HI, LO ; 16, 4
+.macro draw_tile_nmi ID, HI, LO
 
     lda PPU_STATUS        ; PPU_STATUS = $2002
 
@@ -134,4 +134,14 @@
         inx
         cpx #$40
         bne attribute_loop_1
+.endproc
+
+
+.proc load_sprites
+loadsprites:
+    lda sprites, X      ; accesses each sprite in sprites (defined in sprites.asm) starting at index 0
+    sta $0200, X        ; store in sprite memory location
+    inx
+    cpx #$A4            ; each sprite holds 4 bytes of data - Ycoord, tile, attributes and Xcoord - and there are 41 sprites, so 4*41 = 164, or $A4
+    bne loadsprites
 .endproc

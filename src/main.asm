@@ -13,6 +13,7 @@
 .include "./lib/ppu.asm"
 .include "./define/palette.asm"
 .include "./define/level.asm"
+.include "./define/sprites.asm"
 
 .include "./interrupt/irq.asm"              ; not currently using irq code, but it must be defined
 .include "./interrupt/reset.asm"            ; code and macros related to pressing the reset button

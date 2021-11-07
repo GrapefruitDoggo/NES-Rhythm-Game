@@ -4,6 +4,7 @@
     scroll_x: .res 1
     tile_ID: .res 1
     screen_pointer: .res 1
+    sprite_logger: .res 8
 
 .segment "CODE"
 
@@ -17,8 +18,10 @@ nmi:
     nmi_go:
 
     ; set the player metasprite with a proc
-    ; call the oam dma with a macro
+    ; call the oam dma with a proc
     jsr oam_dma
+
+    jsr load_sprites
 
     lda PPU_STATUS ; $2002
 
