@@ -139,9 +139,61 @@
 
 .proc load_sprites
 loadsprites:
-    lda sprites, X      ; accesses each sprite in sprites (defined in sprites.asm) starting at index 0
-    sta $0200, X        ; store in sprite memory location
+    lda sprites, x      ; accesses each sprite in sprites (defined in sprites.asm) starting at index 0
+    sta $0200, x        ; store in sprite memory location
     inx
     cpx #$A4            ; each sprite holds 4 bytes of data - Ycoord, tile, attributes and Xcoord - and there are 41 sprites, so 4*41 = 164, or $A4
     bne loadsprites
 .endproc
+
+/* ; not enough space in prg for these, will need to make space elsewhere
+.proc move_player
+    lda gamepad_new_press
+    and #%01000000
+    bne left_press
+
+    lda gamepad_new_press
+    and #%10000000
+    bne right_press
+
+    lda gamepad_new_press
+    and #%00010000
+    bne up_press
+
+    lda gamepad_new_press
+    and #%00100000
+    bne down_press
+
+left_press:
+    lda player_x
+    sbc #$08
+    sta player_x
+    rti
+
+right_press:
+    lda player_x
+    adc #$08
+    sta player_x
+    rti
+
+up_press:
+    lda player_y
+    sbc #$08
+    sta player_y
+    rti
+
+down_press:
+    lda player_y
+    sbc #$08
+    sta player_y
+    rti
+.endproc
+
+.proc update_player_sprite
+    lda player_y
+    sta $0200
+
+    lda player_x
+    sta $0203
+.endproc
+*/

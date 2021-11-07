@@ -5,6 +5,8 @@
     tile_ID: .res 1
     screen_pointer: .res 1
     sprite_logger: .res 8
+    player_x: .res 1
+    player_y: .res 1
 
 .segment "CODE"
 
@@ -21,7 +23,7 @@ nmi:
     ; call the oam dma with a proc
     jsr oam_dma
 
-    jsr load_sprites
+    ;jsr update_player_sprite
 
     lda PPU_STATUS ; $2002
 

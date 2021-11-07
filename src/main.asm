@@ -27,6 +27,12 @@ gen_screen:
 
     jsr draw_background
     jsr draw_attribute
+    jsr load_sprites
+
+    lda $0200
+    sta player_y
+    lda $0203
+    sta player_x
 
 game_loop:
     lda nmi_ready
@@ -35,5 +41,7 @@ game_loop:
     jsr set_gamepad
 
     set nmi_ready, #$01
+
+    ;jsr move_player
 
     jmp game_loop
