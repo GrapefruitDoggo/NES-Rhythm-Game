@@ -146,7 +146,9 @@ loadsprites:
     bne loadsprites
 .endproc
 
-/* ; not enough space in prg for these, will need to make space elsewhere
+/*
+; not enough space in prg for these, will need to make space elsewhere
+; (actually nvm, there *is* enough space, but the game mysteriously won't work when i uncomment this stuff still even though it's not being called anywhere i think :T)
 .proc move_player
     lda gamepad_new_press
     and #%01000000

@@ -19,8 +19,7 @@
 .include "./interrupt/reset.asm"            ; code and macros related to pressing the reset button
 .include "./interrupt/nmi.asm"
 
-;#$120
-
+.segment "CODE"
 gen_screen:
     lda #$c0
     sta scroll_x
