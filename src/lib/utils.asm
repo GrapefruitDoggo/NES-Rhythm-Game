@@ -1,12 +1,12 @@
 .segment "CODE"
 
-; this is like a x = y call where x is set to the value of y
-.macro set set_var, from
-    lda from
-    sta set_var
+; this is basically an x = y, or in this case target = source
+.macro set target, source
+    lda source
+    sta target
 .endmacro
 
-; this procedure will loop until the next vblank
+; this procedure will loop until the next vblank - something i have yet to look up, really... maybe this is why i'm having problems? ^-^'
 .proc wait_for_vblank
   	bit PPU_STATUS      ; $2002
         vblank_wait:
@@ -16,7 +16,7 @@
         rts
 .endproc
 
-; clear out all the ram on the reset press
+; clear out all the ram - used in reset.asm
 .macro clear_ram
   	lda #0
   	ldx #0
@@ -33,20 +33,24 @@
     		bne clear_ram_loop
 .endmacro
 
-; this code will be called from the nmi
-.macro draw_tile_nmi ID, HI, LO
+; this code draws a single background tile to the screen! currently unused, but will be used when you can actually like select tiles and other gameplay things
+.macro draw_tile ID, HI, LO
 
     lda PPU_STATUS        ; PPU_STATUS = $2002
 
+    ; here we're telling the ppu where on the screen to put the tile we're about to give it - first the hi bit (say $20), then the lo bit (say, idk, $21)
+    ; which forms the two-bit address $2021 :3
     lda HI
     sta PPU_ADDR          ; PPU_ADDR = $2006
     lda LO
     sta PPU_ADDR
 
-    lda ID
+    lda ID  ; the id of the tile we want to draw - each 8x8 pixel square on a tilesheet counts as one 'id' in this system
     sta PPU_DATA
 .endmacro
 
+; this code runs at the start of the game and basically copies everything from level.asm to ppu memory - initialising the gameboard essentially
+; it's basically just draw_tile a bunch, but split into 4 seperate loops because there isn't enough time per frame to do all of this.
 .proc draw_background
     jsr wait_for_vblank
 
@@ -115,6 +119,7 @@
         bne render_loop_4
 .endproc
 
+; like draw_background, but for the attribute table - much shorter, cos there's a lot less data to transfer
 .proc draw_attribute
     jsr wait_for_vblank
 
@@ -136,7 +141,7 @@
         bne attribute_loop_1
 .endproc
 
-
+; this loads all the sprites in sprites.asm. this is to save having to spawn in (and keep track of) new ones later, which would take up already sparse resources
 .proc load_sprites
 loadsprites:
     lda sprites, x      ; accesses each sprite in sprites (defined in sprites.asm) starting at index 0
@@ -148,7 +153,8 @@ loadsprites:
 
 /*
 ; not enough space in prg for these, will need to make space elsewhere
-; (actually nvm, there *is* enough space, but the game mysteriously won't work when i uncomment this stuff still even though it's not being called anywhere i think :T)
+; actually nvm, there *is* enough space, but the game mysteriously won't work when i uncomment this stuff still even though it's not being called anywhere? :T
+; need to do more research on why adding stuff to the prg rom might cause the program to spontaneously combust 
 .proc move_player
     lda gamepad_new_press
     and #%01000000
