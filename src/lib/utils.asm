@@ -190,7 +190,7 @@ up_press:
 
 down_press:
     lda player_y
-    sbc #$08
+    adc #$08
     sta player_y
     rts
 .endproc
