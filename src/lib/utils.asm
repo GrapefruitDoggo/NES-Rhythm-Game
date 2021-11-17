@@ -151,50 +151,48 @@ loadsprites:
     bne loadsprites
 .endproc
 
-/*
-; not enough space in prg for these, will need to make space elsewhere
-; actually nvm, there *is* enough space, but the game mysteriously won't work when i uncomment this stuff still even though it's not being called anywhere? :T
-; need to do more research on why adding stuff to the prg rom might cause the program to spontaneously combust 
 .proc move_player
     lda gamepad_new_press
-    and #%01000000
-    bne left_press
+    and #%01000000      ; if left button is being pressed...
+    bne left_press      ; do stuff at the left_press label
 
     lda gamepad_new_press
-    and #%10000000
+    and #%10000000      ; above, but right
     bne right_press
 
     lda gamepad_new_press
-    and #%00010000
+    and #%00010000      ; above, but up
     bne up_press
 
     lda gamepad_new_press
-    and #%00100000
+    and #%00100000      ; above, but down
     bne down_press
+
+    rts                 ; if nothing's being pressed, go back to the program
 
 left_press:
     lda player_x
     sbc #$08
     sta player_x
-    rti
+    rts
 
 right_press:
     lda player_x
     adc #$08
     sta player_x
-    rti
+    rts
 
 up_press:
     lda player_y
     sbc #$08
     sta player_y
-    rti
+    rts
 
 down_press:
     lda player_y
     sbc #$08
     sta player_y
-    rti
+    rts
 .endproc
 
 .proc update_player_sprite
@@ -204,4 +202,3 @@ down_press:
     lda player_x
     sta $0203
 .endproc
-*/

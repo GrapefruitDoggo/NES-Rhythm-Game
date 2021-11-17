@@ -48,9 +48,10 @@ game_loop:
     set nmi_ready, #$01 ; this is a macro! they're a fun thing that ca65 has where it'll replace this with some predefined code - this one, set, is in utils.asm
 
     ; here is where we'd run our game logic. for now, that's just moving the player cursor diagonally down and right, because... well why not really :3
-    inc $0200
-    inc $0203
+    inc player_y
+    inc player_x
+    ;jsr update_player_sprite
 
-    ;jsr move_player  ; see the bottom of utils for why this one is commented out -_-
+    jsr move_player  ; see the bottom of utils for why this one is commented out -_-
 
     jmp game_loop

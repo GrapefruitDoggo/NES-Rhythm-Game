@@ -23,7 +23,7 @@ nmi:
     ; call the oam dma with a proc
     jsr oam_dma
 
-    ;jsr update_player_sprite
+    jsr update_player_sprite
 
     lda PPU_STATUS ; $2002
 
