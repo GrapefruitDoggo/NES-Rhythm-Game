@@ -151,48 +151,64 @@ loadsprites:
     bne loadsprites
 .endproc
 
-.proc move_player
+.proc button_logic
     lda gamepad_new_press
     and #%01000000      ; if left button is being pressed...
     bne left_press      ; do stuff at the left_press label
-
+left_done:
     lda gamepad_new_press
     and #%10000000      ; above, but right
     bne right_press
-
+right_done:
     lda gamepad_new_press
     and #%00010000      ; above, but up
     bne up_press
-
+up_done:
     lda gamepad_new_press
     and #%00100000      ; above, but down
     bne down_press
-
+down_done:
+    lda gamepad_new_press
+    and #%00000001      ; above, but a
+    bne a_press
+a_done:
+    lda gamepad_new_press
+    and #%00000010      ; above, but b
+    bne b_press
+b_done:
     rts                 ; if nothing's being pressed, go back to the program
 
 left_press:
     lda player_x
     sbc #$08
     sta player_x
-    rts
+    jmp left_done
 
 right_press:
     lda player_x
     adc #$08
     sta player_x
-    rts
+    jmp right_done
 
 up_press:
     lda player_y
     sbc #$08
     sta player_y
-    rts
+    jmp up_done
 
 down_press:
     lda player_y
     adc #$08
     sta player_y
-    rts
+    jmp down_done
+
+a_press:
+    dec $201
+    jmp a_done
+
+b_press:
+    inc $201
+    jmp b_done
 .endproc
 
 .proc update_player_sprite

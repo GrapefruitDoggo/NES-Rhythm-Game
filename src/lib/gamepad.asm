@@ -32,9 +32,9 @@
 
 GAMEPAD_REGISTER = $4016
 
-; initialize the gamepad.  this is called from the set_gamepad
+; initialize the gamepad.  this is called from the check_gamepad
 .proc gamepad_init
-    set gamepad_last_press, gamepad_press       ; save gamepad_press to gamepad_last_press
+    set gamepad_last_press, gamepad_press       ; set gamepad_last_press to gamepad_press
 
     ; Setup the gamepad register so we can start pulling gamepad data
     set  GAMEPAD_REGISTER, #1
@@ -59,14 +59,12 @@ GAMEPAD_REGISTER = $4016
 .endmacro
 
 ; initialize and set the gamepad values
-.proc set_gamepad
+.proc check_gamepad
 
     jsr gamepad_init ; prepare the gamepad register to pull data serially
 
     gamepad_a:
-        lda GAMEPAD_REGISTER
-        and #%00000001
-        sta gamepad_press
+        button_press_check PRESS_A
 
     gamepad_b:
         button_press_check PRESS_B

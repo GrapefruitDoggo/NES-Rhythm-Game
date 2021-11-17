@@ -43,12 +43,12 @@ game_loop:
     bne game_loop ; if nmi_ready equals anything but 0, this will send us back up to line 37 - nmi_ready will be set to 0 when an NMI has occurred
                   ; when we're not waiting for a non-maskable interrupt (NMI), we can proceed, to give us the most program time possible before the next one
 
-    jsr set_gamepad ; this basically reads the gamepad inputs and sets a bunch of things - more info in gamepad.asm
+    jsr check_gamepad ; this basically reads the gamepad inputs and sets a bunch of things - more info in gamepad.asm
 
     set nmi_ready, #$01 ; this is a macro! they're a fun thing that ca65 has where it'll replace this with some predefined code - this one, set, is in utils.asm
 
     ; here is where we'd run our game logic. for now, that's just moving the player cursor diagonally down and right, because... well why not really :3
 
-    jsr move_player  ; see the bottom of utils for why this one is commented out -_-
+    jsr button_logic  ; see the bottom of utils for why this one is commented out -_-
 
     jmp game_loop
