@@ -32,7 +32,7 @@
 
 GAMEPAD_REGISTER = $4016
 
-; initialize the gamepad.  this is called from the check_gamepad
+; Initialize the gamepad. This is called from check_gamepad
 .proc gamepad_init
     set gamepad_last_press, gamepad_press       ; set gamepad_last_press to gamepad_press
 

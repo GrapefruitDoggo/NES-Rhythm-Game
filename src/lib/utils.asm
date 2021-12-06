@@ -217,4 +217,5 @@ b_press:
 
     lda player_x
     sta $0203
+    rts
 .endproc

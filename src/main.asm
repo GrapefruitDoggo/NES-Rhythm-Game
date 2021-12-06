@@ -49,6 +49,6 @@ game_loop:
 
     ; here is where we'd run our game logic. for now, that's just moving the player cursor diagonally down and right, because... well why not really :3
 
-    jsr button_logic  ; see the bottom of utils for why this one is commented out -_-
+    jsr button_logic
 
     jmp game_loop
