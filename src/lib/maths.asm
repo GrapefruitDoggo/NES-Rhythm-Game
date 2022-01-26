@@ -11,3 +11,10 @@
     asl
     and #%11111100
 .endmacro
+
+.macro octuple_accumulator
+    asl
+    asl
+    asl
+    and #%11111000
+.endmacro

@@ -179,31 +179,66 @@ b_done:
     rts                 ; if nothing's being pressed, go back to the program
 
 left_press:
+    sec
     lda player_x
-    sbc #$08
+    sbc #$01
     sta player_x
     jmp left_done
 
 right_press:
+    clc
     lda player_x
-    adc #$08
+    adc #$01
     sta player_x
     jmp right_done
 
 up_press:
+    sec
     lda player_y
-    sbc #$08
+    sbc #$01
     sta player_y
     jmp up_done
 
 down_press:
+    clc
     lda player_y
-    adc #$08
+    adc #$01
     sta player_y
     jmp down_done
 
 a_press:
-    dec $201
+    lda player_y
+
+    ; draw a tile at the cursor's position - will later be changed to select a tile for revealing
+    ; multiply by 32
+    asl
+    asl
+    asl
+    asl
+    asl
+    clc
+    adc player_x
+    adc #$20
+    sta x_mem
+
+    lda player_y
+    lsr
+    lsr
+    lsr
+    tax
+
+    lda x_mem
+    and #%11110000
+    beq skip_clear_carry
+        clc
+
+    skip_clear_carry:
+    txa
+    adc #$21
+    sta y_mem
+
+    draw_tile #$11, y_mem, x_mem
+
     jmp a_done
 
 b_press:
@@ -213,9 +248,53 @@ b_press:
 
 .proc update_player_sprite
     lda player_y
+    cmp #$ff
+    bne no_top_warp
+        lda #$0f
+        sta player_y
+    no_top_warp:
+    cmp #$10
+    bne no_bottom_warp
+        lda #$00
+        sta player_y
+    no_bottom_warp:
+    clc
+
+    ; offset of 9 "tiles" to make player_y = 0 the topmost tile
+    adc #$9
+
+    ; multiply by 8
+    asl
+    asl
+    asl
+    and #%11111000
+
+    ; subtract 1, because for some reason the sprite is one pixel too low
+    sec
+    sbc #$01
     sta $0200
 
     lda player_x
+    cmp #$ff
+    bne no_left_warp
+        lda #$0f
+        sta player_x
+    no_left_warp:
+    cmp #$10
+    bne no_right_warp
+        lda #$00
+        sta player_x
+    no_right_warp:
+    clc
+
+    ; offset of 8 "tiles" to make player_x = 0 the leftmost tile
+    adc #$8
+
+    ; multiply by 8
+    asl
+    asl
+    asl
+    and #%11111000
     sta $0203
     rts
 .endproc

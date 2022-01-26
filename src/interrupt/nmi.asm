@@ -7,6 +7,8 @@
     sprite_logger: .res 8
     player_x: .res 1
     player_y: .res 1
+    x_mem: .res 1
+    y_mem: .res 1
 
 .segment "CODE"
 
