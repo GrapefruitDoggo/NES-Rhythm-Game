@@ -20,7 +20,7 @@
 .include "./lib/gamepad.asm"
 .include "./lib/ppu.asm"
 .include "./define/palette.asm"
-;.include "./define/level.asm"
+.include "./define/level.asm"
 .include "./define/title.asm"
 .include "./define/sprites.asm"
 

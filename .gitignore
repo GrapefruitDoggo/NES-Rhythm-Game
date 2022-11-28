@@ -1,5 +1,4 @@
 cc65/
-*.command
+build/info/
+*.nes
 *.o
-*.bat
-.DS_Store

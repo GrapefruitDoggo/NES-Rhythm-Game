@@ -63,8 +63,8 @@
     stx PPU_ADDR          ; Low byte
 
     render_loop_1:
-        ;lda minesweeper, x
-        lda title, x
+        lda minesweeper, x
+        ;lda title, x
         sta PPU_DATA
 
         inx
@@ -80,8 +80,8 @@
     stx PPU_ADDR          ; Low byte
 
     render_loop_2:
-        ;lda minesweeper+$0100, x
-        lda title+$0100, x
+        lda minesweeper+$0100, x
+        ;lda title+$0100, x
         sta PPU_DATA
 
         inx
@@ -97,8 +97,8 @@
     stx PPU_ADDR          ; Low byte
 
     render_loop_3:
-        ;lda minesweeper+$0200, x
-        lda title+$0200, x
+        lda minesweeper+$0200, x
+        ;lda title+$0200, x
         sta PPU_DATA
 
         inx
@@ -114,8 +114,8 @@
     stx PPU_ADDR          ; Low byte
 
     render_loop_4:
-        ;lda minesweeper+$0300, x
-        lda title+$0300, x
+        lda minesweeper+$0300, x
+        ;lda title+$0300, x
         sta PPU_DATA
 
         inx
