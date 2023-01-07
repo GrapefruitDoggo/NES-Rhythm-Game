@@ -50,10 +50,9 @@
 .endmacro
 
 ; this code runs at the start of the game and basically copies everything from level.asm to ppu memory - initialising the gameboard essentially
-; it's basically just draw_tile a bunch, but split into 4 seperate loops because there isn't enough time per frame to do all of this.
+; it's basically just draw_tile a bunch, but split into 4 seperate loops.
 .proc draw_background
-    jsr wait_for_vblank
-
+    ; bytes 0-255
     ldy #$20
     ldx #$00
 
@@ -70,49 +69,38 @@
         inx
         bne render_loop_1
 
-    jsr wait_for_vblank
-
     ldy #$21
-
-    lda PPU_STATUS        ; PPU_STATUS = $2002
 
     sty PPU_ADDR          ; High byte
     stx PPU_ADDR          ; Low byte
 
     render_loop_2:
         lda minesweeper+$0100, x
-        ;lda title+$0100, x
+        ;lda title, x
         sta PPU_DATA
 
         inx
         bne render_loop_2
 
-    jsr wait_for_vblank
-
     ldy #$22
-
-    lda PPU_STATUS        ; PPU_STATUS = $2002
-
+    
     sty PPU_ADDR          ; High byte
     stx PPU_ADDR          ; Low byte
 
     render_loop_3:
         lda minesweeper+$0200, x
-        ;lda title+$0200, x
+        ;lda title, x
         sta PPU_DATA
 
         inx
         bne render_loop_3
 
-    jsr wait_for_vblank
-
     ldy #$23
-
-    lda PPU_STATUS        ; PPU_STATUS = $2002
-
+    
     sty PPU_ADDR          ; High byte
     stx PPU_ADDR          ; Low byte
 
+    ; the final loop has a few less bytes to load
     render_loop_4:
         lda minesweeper+$0300, x
         ;lda title+$0300, x
@@ -121,12 +109,11 @@
         inx
         cpx #$bf
         bne render_loop_4
+    rts
 .endproc
 
 ; like draw_background, but for the attribute table - much shorter, cos there's a lot less data to transfer
 .proc draw_attribute
-    jsr wait_for_vblank
-
     lda PPU_STATUS        ; PPU_STATUS = $2002
 
     lda #$23
@@ -143,6 +130,7 @@
         inx
         cpx #$40
         bne attribute_loop_1
+    rts
 .endproc
 
 ; this loads all the sprites in sprites.asm. this is to save having to spawn in (and keep track of) new ones later, which would take up already sparse resources
@@ -153,6 +141,7 @@ loadsprites:
     inx
     cpx #$A4            ; each sprite holds 4 bytes of data - Ycoord, tile, attributes and Xcoord - and there are 41 sprites, so 4*41 = 164, or $A4
     bne loadsprites
+    rts
 .endproc
 
 .proc button_logic
@@ -184,34 +173,34 @@ b_done:
 
 left_press:
     sec
-    lda player_x
+    lda cursor_x
     sbc #$01
-    sta player_x
+    sta cursor_x
     jmp left_done
 
 right_press:
     clc
-    lda player_x
+    lda cursor_x
     adc #$01
-    sta player_x
+    sta cursor_x
     jmp right_done
 
 up_press:
     sec
-    lda player_y
+    lda cursor_y
     sbc #$01
-    sta player_y
+    sta cursor_y
     jmp up_done
 
 down_press:
     clc
-    lda player_y
+    lda cursor_y
     adc #$01
-    sta player_y
+    sta cursor_y
     jmp down_done
 
 a_press:
-    lda player_y
+    lda cursor_y
 
     ; draw a tile at the cursor's position - will later be changed to select a tile for revealing
     ; multiply by 32
@@ -221,11 +210,11 @@ a_press:
     asl
     asl
     clc
-    adc player_x
+    adc cursor_x
     adc #$20
     sta x_mem
 
-    lda player_y
+    lda cursor_y
     lsr
     lsr
     lsr
@@ -250,21 +239,21 @@ b_press:
     jmp b_done
 .endproc
 
-.proc update_player_sprite
-    lda player_y
+.proc update_cursor_sprite
+    lda cursor_y
     cmp #$ff
     bne no_top_warp
         lda #$0f
-        sta player_y
+        sta cursor_y
     no_top_warp:
     cmp #$10
     bne no_bottom_warp
         lda #$00
-        sta player_y
+        sta cursor_y
     no_bottom_warp:
     clc
 
-    ; offset of 9 "tiles" to make player_y = 0 the topmost tile
+    ; offset of 9 "tiles" to make cursor_y = 0 the topmost tile
     adc #$9
 
     ; multiply by 8
@@ -278,20 +267,20 @@ b_press:
     sbc #$01
     sta $0200
 
-    lda player_x
+    lda cursor_x
     cmp #$ff
     bne no_left_warp
         lda #$0f
-        sta player_x
+        sta cursor_x
     no_left_warp:
     cmp #$10
     bne no_right_warp
         lda #$00
-        sta player_x
+        sta cursor_x
     no_right_warp:
     clc
 
-    ; offset of 8 "tiles" to make player_x = 0 the leftmost tile
+    ; offset of 8 "tiles" to make cursor_x = 0 the leftmost tile
     adc #$8
 
     ; multiply by 8

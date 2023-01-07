@@ -244,8 +244,21 @@ OAM_DMA = $4014	; aaaa aaaa	OAM DMA high address
     rts
 .endproc
 
+.proc disable_rendering
+    lda #$00
+    sta PPU_MASK
+    rts
+.endproc
+
+.proc enable_rendering
+    lda #(PPU_MASK_SHOW_SPRITES|PPU_MASK_SHOW_BACKGROUND|PPU_MASK_SHOW_SPRITES_L8|PPU_MASK_SHOW_BACKGROUND_L8)
+    sta PPU_MASK
+    rts
+.endproc
+
 .proc oam_dma
     set PPU_CTRL, #%10010000 ; PPU_CTRL_NMI_ENABLE
+
 ;=============================================
 ; PPU_MASK_EMPH_BLUE          = %10000000
 ; PPU_MASK_EMPH_GREEN         = %01000000
@@ -257,8 +270,6 @@ OAM_DMA = $4014	; aaaa aaaa	OAM DMA high address
 ; PPU_MASK_GRAYSCALE          = %00000001
 ;=============================================
 
-    lda #(PPU_MASK_SHOW_SPRITES|PPU_MASK_SHOW_BACKGROUND|PPU_MASK_SHOW_SPRITES_L8|PPU_MASK_SHOW_BACKGROUND_L8) ; PPU_MASK_SHOW_SPRITES
-    sta PPU_MASK
     set OAM_ADDR, #0
     set OAM_DMA, #$02
 

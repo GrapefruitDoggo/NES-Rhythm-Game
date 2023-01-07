@@ -5,9 +5,9 @@
 .linecont       +               ; Allow line continuations
 .feature        c_comments      /* allow this style of comment */
 
-; after we load the sprites, we know that this one should always point to the player's y and x position respectively, unless something has gone horribly wrong
-.define PlayerY $0200
-.define PlayerX $0203
+; after we load the sprites, we know that this one should always point to the player cursor's y and x position respectively, unless something has gone horribly wrong
+.define CursorY $0200
+.define CursorX $0203
 
 .segment "VARS"
     level: .res $100
@@ -32,6 +32,9 @@
 ; i put this right at the start of the program mostly as a hackey way to get around the fact that it takes more than one frame to draw all of this stuff
 ; and i don't know enough about the NES or 6502 to really mitigate that, it should work fine though i hope :3
 gen_screen:
+    jsr wait_for_vblank
+    jsr disable_rendering
+
     lda #$c0
     sta scroll_x
 
@@ -39,17 +42,21 @@ gen_screen:
     jsr draw_attribute  ; the attribute table is basically where all the colour palettes get assigned to regions on the screen
     jsr load_sprites
 
+    jsr enable_rendering
+
 game_loop:
     lda nmi_ready
-    bne game_loop ; if nmi_ready equals anything but 0, this will send us back up to line 37 - nmi_ready will be set to 0 when an NMI has occurred
+    bne game_loop ; if nmi_ready equals anything but 0, this will send us back up to game_loop - nmi_ready will be set to 0 when an NMI has occurred
                   ; when we're not waiting for a non-maskable interrupt (NMI), we can proceed, to give us the most program time possible before the next one
-
-    jsr check_gamepad ; this basically reads the gamepad inputs and sets a bunch of things - more info in gamepad.asm
 
     set nmi_ready, #$01 ; this is a macro! they're a fun thing that ca65 has where it'll replace this with some predefined code - this one, set, is in utils.asm
 
-    ; here is where we'd run our game logic. for now, that's just moving the player cursor diagonally down and right, because... well why not really :3
+    ; GAME LOGIC START
+
+    jsr check_gamepad ; this basically reads the gamepad inputs and sets a bunch of things - more info in gamepad.asm
 
     jsr button_logic
+
+    ; GAME LOGIC END
 
     jmp game_loop

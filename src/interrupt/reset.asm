@@ -52,7 +52,8 @@ reset:
         jsr load_palettes
         inc palette_init
     palette_loaded:
-    */
+*/
+
     jsr load_palettes
 
     jsr load_attribute

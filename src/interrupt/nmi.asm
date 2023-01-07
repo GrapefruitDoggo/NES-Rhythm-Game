@@ -5,8 +5,8 @@
     tile_ID: .res 1
     screen_pointer: .res 1
     sprite_logger: .res 8
-    player_x: .res 1
-    player_y: .res 1
+    cursor_x: .res 1
+    cursor_y: .res 1
     x_mem: .res 1
     y_mem: .res 1
 
@@ -21,16 +21,16 @@ nmi:
         rti
     nmi_go:
 
-    ; set the player metasprite with a proc
-    ; call the oam dma with a proc
-    jsr oam_dma
-
-    jsr update_player_sprite
+    ; set the cursor metasprite with a proc
+    jsr update_cursor_sprite
 
     lda PPU_STATUS ; $2002
 
     set PPU_SCROLL, scroll_x
     set PPU_SCROLL, #0
+
+    ; initialise render
+    jsr oam_dma
 
     set nmi_ready, #0
 
