@@ -23,8 +23,8 @@ function failed {
         mv build/info/labels.txt.backup build/info/labels.txt
     fi
 
-    if test -f build/info/nes.dbg.backup; then
-        mv build/info/nes.dbg.backup build/info/nes.dbg
+    if test -f build/info/NES-Mines.dbg.backup; then
+        mv build/info/NES-Mines.dbg.backup build/info/NES-Mines.dbg
     fi
 
     exit
@@ -51,8 +51,8 @@ if test -f build/info/labels.txt; then
     mv build/info/labels.txt build/info/labels.txt.backup
 fi
 
-if test -f build/info/nes.dbg; then
-    mv build/info/nes.dbg build/info/nes.dbg.backup
+if test -f build/info/NES-Mines.dbg; then
+    mv build/info/NES-Mines.dbg build/info/NES-Mines.dbg.backup
 fi
 
 echo "Setup complete"
@@ -72,7 +72,7 @@ fi
 # --link--
 echo "Linking..."
 
-if ld65 -o build/NES-Mines.nes -C src/linker.cfg build/main.o -m build/info/map.txt -Ln build/info/labels.txt --dbgfile build/info/nes.dbg ; then
+if ld65 -o build/NES-Mines.nes -C src/linker.cfg build/main.o -m build/info/map.txt -Ln build/info/labels.txt --dbgfile build/info/NES-Mines.dbg ; then
     echo "Linking complete"
     echo ""
 else
@@ -97,8 +97,8 @@ if test -f build/info/labels.txt.backup; then
     rm build/info/labels.txt.backup
 fi
 
-if test -f build/info/nes.dbg.backup; then
-    rm build/info/nes.dbg.backup
+if test -f build/info/NES-Mines.dbg.backup; then
+    rm build/info/NES-Mines.dbg.backup
 fi
 
 python build/scripts/fceux_symbols.py

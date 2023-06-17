@@ -135,6 +135,8 @@
 
 ; this loads all the sprites in sprites.asm. this is to save having to spawn in (and keep track of) new ones later, which would take up already sparse resources
 .proc load_sprites
+    ldx #$00
+
 loadsprites:
     lda sprites, x      ; accesses each sprite in sprites (defined in sprites.asm) starting at index 0
     sta $0200, x        ; store in sprite memory location
