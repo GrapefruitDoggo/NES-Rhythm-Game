@@ -26,8 +26,8 @@ nmi:
 
     lda PPU_STATUS ; $2002
 
-    set PPU_SCROLL, scroll_x
-    set PPU_SCROLL, #0
+    set PPU_SCROLL, scroll_x ; horizontal scroll
+    set PPU_SCROLL, #0 ; vertical scroll
 
     ; initialise render
     jsr oam_dma

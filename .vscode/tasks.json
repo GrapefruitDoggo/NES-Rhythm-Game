@@ -6,7 +6,7 @@
         {
             "label": "Build NES project",
             "type": "shell",
-            "command": "cd build/scripts\n./build.sh",
+            "command": "cd build/scripts\n./build.sh\nmesen ../NES-Mines.nes",
             "problemMatcher": [
                 {
 		    "owner": "nesdev",
