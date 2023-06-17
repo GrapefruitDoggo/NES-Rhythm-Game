@@ -33,7 +33,7 @@
     		bne clear_ram_loop
 .endmacro
 
-; this code draws a single background tile to the screen! currently unused, but will be used when you can actually like select tiles and other gameplay things
+; this code draws a single background tile to the screen!
 .macro draw_tile ID, HI, LO
 
     lda PPU_STATUS        ; PPU_STATUS = $2002
@@ -44,6 +44,10 @@
     sta PPU_ADDR          ; PPU_ADDR = $2006
     lda LO
     sta PPU_ADDR
+
+    ; we need to set the scrollafter accessing PPU_ADDR, since doing that resets scroll back to $0 for some reason
+    set PPU_SCROLL, scroll_x ; horizontal scroll
+    set PPU_SCROLL, #0 ; vertical scroll
 
     lda ID  ; the id of the tile we want to draw - each 8x8 pixel square on a tilesheet counts as one 'id' in this system
     sta PPU_DATA
