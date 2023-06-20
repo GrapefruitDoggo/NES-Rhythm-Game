@@ -1,3 +1,8 @@
+; TODO: finish tile search - if a tile is blank, then have all the tiles around it search themselves
+;       impliment lose condition (explosion)
+;       impliment in-game timer
+;       impliment flag placing (including top-left ticker, sprite placing, and blocking that tile from being opened)
+
 ; lots of this code (and some of the comments) isn't mine, mostly because i didn't want to spend half a year learning the 6502 architecture and nes mapping before i could even
 ; start writing a game - i learn better by actually trying to code something :3
 ; The base 'engine' code comes from: https://github.com/battlelinegames/nes-starter-kit
@@ -129,11 +134,11 @@ place_mines:
         jsr get_rand ; pick a random tile
         ldy y_mem
 
-        get_coords_from_acc
+        get_address_from_acc
         get_tile y_mem, x_mem
-        cmp #$9c ; if that tile is a mine already, pick another
+        cmp #$11 ; if that tile is a mine already, pick another
         beq try_place
-    draw_tile #$9c, y_mem, x_mem ; otherwise, draw a hidden mine tile...
+    draw_tile #$11, y_mem, x_mem ; otherwise, draw a hidden mine tile...
     dey ; ...decrement y...
     bne try_place ; ...and return to the top of the loop
 
