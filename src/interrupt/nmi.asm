@@ -9,8 +9,12 @@
     cursor_y: .res 1
     x_mem: .res 1
     y_mem: .res 1
+    x_coord_mem: .res 1
+    y_coord_mem: .res 1
     rand_seed: .res 2
     timer: .res 1
+    inter: .res 1
+    leapfrog: .res 1
 
 .segment "CODE"
 
