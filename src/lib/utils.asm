@@ -8,7 +8,6 @@
 
 ; this procedure will loop until the next vblank
 .proc wait_for_vblank
-    lda #$0
   	bit PPU_STATUS      ; $2002
         vblank_wait:
     		bit PPU_STATUS  ; $2002
@@ -173,7 +172,7 @@
 
 ; this code runs at the start of the game and basically copies everything from level.asm to ppu memory - initialising the gameboard essentially
 ; it's basically just draw_tile a bunch, but split into 4 seperate loops.
-.proc draw_background
+.proc draw_level
     ; bytes 0-255
     ldy #$20
     ldx #$00
@@ -183,39 +182,36 @@
     sty PPU_ADDR          ; High byte
     stx PPU_ADDR          ; Low byte
 
-    render_loop_1:
+    level_render_loop_1:
         lda level, x
-        ;lda title, x
         sta PPU_DATA
 
         inx
-        bne render_loop_1
+        bne level_render_loop_1
 
     ldy #$21
 
     sty PPU_ADDR          ; High byte
     stx PPU_ADDR          ; Low byte
 
-    render_loop_2:
+    level_render_loop_2:
         lda level+$0100, x
-        ;lda title, x
         sta PPU_DATA
 
         inx
-        bne render_loop_2
+        bne level_render_loop_2
 
     ldy #$22
     
     sty PPU_ADDR          ; High byte
     stx PPU_ADDR          ; Low byte
 
-    render_loop_3:
+    level_render_loop_3:
         lda level+$0200, x
-        ;lda title, x
         sta PPU_DATA
 
         inx
-        bne render_loop_3
+        bne level_render_loop_3
 
     ldy #$23
     
@@ -223,19 +219,95 @@
     stx PPU_ADDR          ; Low byte
 
     ; the final loop has a few less bytes to load
-    render_loop_4:
+    level_render_loop_4:
         lda level+$0300, x
-        ;lda title+$0300, x
         sta PPU_DATA
 
         inx
         cpx #$bf
-        bne render_loop_4
+        bne level_render_loop_4
     rts
 .endproc
 
-; like draw_background, but for the attribute table - much shorter, cos there's a lot less data to transfer
-.proc draw_attribute
+; like draw_level, but for the attribute table - much shorter, cos there's a lot less data to transfer
+.proc draw_level_attribute
+    lda PPU_STATUS        ; PPU_STATUS = $2002
+
+    lda #$23
+    sta PPU_ADDR          ; High byte
+    lda #$c0
+    sta PPU_ADDR          ; Low byte
+
+    ldx #$00
+
+    level_attribute_loop_1:
+        lda level_attribute, x
+        sta PPU_DATA
+
+        inx
+        cpx #$40
+        bne level_attribute_loop_1
+    rts
+.endproc
+
+.proc draw_menu
+    ; bytes 0-255
+    ldy #$20
+    ldx #$00
+
+    lda PPU_STATUS        ; PPU_STATUS = $2002
+
+    sty PPU_ADDR          ; High byte
+    stx PPU_ADDR          ; Low byte
+
+    menu_render_loop_1:
+        lda menu, x
+        sta PPU_DATA
+
+        inx
+        bne menu_render_loop_1
+
+    ldy #$21
+
+    sty PPU_ADDR          ; High byte
+    stx PPU_ADDR          ; Low byte
+
+    menu_render_loop_2:
+        lda menu+$0100, x
+        sta PPU_DATA
+
+        inx
+        bne menu_render_loop_2
+
+    ldy #$22
+    
+    sty PPU_ADDR          ; High byte
+    stx PPU_ADDR          ; Low byte
+
+    menu_render_loop_3:
+        lda menu+$0200, x
+        sta PPU_DATA
+
+        inx
+        bne menu_render_loop_3
+
+    ldy #$23
+    
+    sty PPU_ADDR          ; High byte
+    stx PPU_ADDR          ; Low byte
+
+    ; the final loop has a few less bytes to load
+    menu_render_loop_4:
+        lda menu+$0300, x
+        sta PPU_DATA
+
+        inx
+        cpx #$bf
+        bne menu_render_loop_4
+    rts
+.endproc
+
+.proc draw_menu_attribute
     lda PPU_STATUS        ; PPU_STATUS = $2002
 
     lda #$23
@@ -246,7 +318,7 @@
     ldx #$00
 
     attribute_loop_1:
-        lda attribute, x
+        lda level_attribute, x
         sta PPU_DATA
 
         inx

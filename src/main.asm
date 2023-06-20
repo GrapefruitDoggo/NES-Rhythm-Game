@@ -21,7 +21,7 @@
 .include "./lib/ppu.asm"
 .include "./define/palette.asm"
 .include "./define/level.asm"
-.include "./define/title.asm"
+.include "./define/menu.asm"
 .include "./define/sprites.asm"
 
 .include "./interrupt/irq.asm"              ; not currently using irq code, but it must be defined
@@ -31,20 +31,41 @@
 .segment "CODE"
 
 load_menu:
+;jsr wait_for_vblank
+;jsr disable_rendering
+
+;jsr draw_menu
+;jsr draw_attribute  ; the attribute table is basically where all the colour palettes get assigned to regions on the screen
+;jsr load_sprites
+
+menu_loop:
 
 set_seed:
     set rand_seed, #$53
     set rand_seed+1, #$23
 
+    lda rand_seed
+    cmp #$0
+    bne lo_seed_not_zero
+    inc rand_seed
+    lo_seed_not_zero:
+
+    lda rand_seed+1
+    cmp #$0
+    bne hi_seed_not_zero
+    inc rand_seed+1
+    hi_seed_not_zero:
+
 load_level:
+    lda #$0 ; zero the accumulator so it's empty for future use
     jsr wait_for_vblank
     jsr disable_rendering
 
     lda #$c0
     sta scroll_x
 
-    jsr draw_background
-    jsr draw_attribute  ; the attribute table is basically where all the colour palettes get assigned to regions on the screen
+    jsr draw_level
+    jsr draw_level_attribute  ; the attribute table is basically where all the colour palettes get assigned to regions on the screen
     jsr load_sprites
 
 place_mines:
