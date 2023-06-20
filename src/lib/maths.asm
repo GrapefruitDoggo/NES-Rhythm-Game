@@ -1,20 +1,14 @@
 ; this will get filled up more eventually, but i figured a maths library will come in handy :3
 
-; this and the one below feel *super* janky, i should figure out a better solution i think
-.macro double_accumulator
-    asl
-    and #%11111110
+.macro divide_acc_by_16
+    lsr
+    lsr
+    lsr
+    lsr
 .endmacro
 
-.macro quadruple_accumulator
-    asl
-    asl
-    and #%11111100
-.endmacro
-
-.macro octuple_accumulator
+.macro multiply_acc_by_8
     asl
     asl
     asl
-    and #%11111000
 .endmacro
