@@ -10,6 +10,7 @@
     x_mem: .res 1
     y_mem: .res 1
     rand_seed: .res 2
+    timer: .res 1
 
 .segment "CODE"
 

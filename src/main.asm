@@ -41,6 +41,9 @@ load_menu:
     lda #$c0
     sta scroll_x
 
+    lda #$0
+    sta timer
+
     jsr enable_rendering
 
 menu_loop:
@@ -51,6 +54,9 @@ menu_loop:
     set nmi_ready, #$01 ; this is a macro! they're a fun thing that ca65 has where it'll replace this with some predefined code - this one, set, is in utils.asm
 
     ; MENU LOGIC START
+    
+    ; increment timer for random seeds later
+    inc timer
 
     jsr check_gamepad ; this basically reads the gamepad inputs and sets a bunch of things - more info in gamepad.asm
 
@@ -61,8 +67,38 @@ menu_loop:
     beq menu_loop
 
 set_seed:
-    set rand_seed, #$53
-    set rand_seed+1, #$23
+    ; turn timer into two seperate seeds
+    lda timer
+    sta rand_seed
+    eor #%11111111
+    sta rand_seed+1
+
+    ; shuffle the seed if it's even - makes things less predictable
+    lda rand_seed
+    and #%00000001
+    bne skip_lo_seed_shuffle
+        lda rand_seed
+        rol
+        rol
+        rol
+        rol
+        eor #%11111111
+        sta rand_seed
+    
+    skip_lo_seed_shuffle:
+
+    lda rand_seed+1
+    and #%00000001
+    bne skip_hi_seed_shuffle
+        lda rand_seed+1
+        rol
+        rol
+        rol
+        rol
+        eor #%11111111
+        sta rand_seed+1
+    
+    skip_hi_seed_shuffle:
 
     lda rand_seed
     cmp #$0
@@ -95,9 +131,9 @@ place_mines:
 
         get_coords_from_acc
         get_tile y_mem, x_mem
-        cmp #$1 ; if that tile is a mine already, pick another
+        cmp #$9c ; if that tile is a mine already, pick another
         beq try_place
-    draw_tile #$1, y_mem, x_mem ; otherwise, draw a hidden mine tile...
+    draw_tile #$9c, y_mem, x_mem ; otherwise, draw a hidden mine tile...
     dey ; ...decrement y...
     bne try_place ; ...and return to the top of the loop
 
