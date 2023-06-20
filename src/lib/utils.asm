@@ -6,8 +6,9 @@
     sta target
 .endmacro
 
-; this procedure will loop until the next vblank - something i have yet to look up, really... maybe this is why i'm having problems? ^-^'
+; this procedure will loop until the next vblank
 .proc wait_for_vblank
+    lda #$0
   	bit PPU_STATUS      ; $2002
         vblank_wait:
     		bit PPU_STATUS  ; $2002
@@ -71,12 +72,73 @@
 
     lda PPU_DATA
     lda PPU_DATA  ; the id of the tile we are looking at
-    sta get_tile_return
 .endmacro
 
+; gets tile coordinates from the number in the accumulator
+.macro get_coords_from_acc
 
+    sta y_mem
 
-; find cursor position
+    ; find X coord
+    and #%00001111 ; modulo 16
+    sta x_mem
+
+    ; find Y coord
+    lda y_mem
+    divide_acc_by_16
+    sta y_mem
+
+    ; following is based on find_cursor
+    asl
+    asl
+    asl
+    asl
+    asl
+    clc
+
+    adc x_mem
+    adc #$20
+    sta x_mem
+
+    lda y_mem
+    lsr
+    lsr
+    lsr
+    tax
+
+    lda x_mem
+    and #%11110000
+    beq skip_clear_carry_2
+        clc
+
+    skip_clear_carry_2:
+    txa
+    adc #$21
+    sta y_mem
+.endmacro
+
+; gets a random number from the seed, and outputs the result in the a register
+.proc get_rand
+
+    ldy #$8 ; we iterate over the following code 8 times, randomising one bit each time
+    lda rand_seed ; load the LSB of the seed
+
+    rand_loop:
+    asl ; shift rand lo bit left
+    rol rand_seed+1 ; shift rand hi bit left
+    bcc skip_xor
+    eor #$39
+
+    skip_xor:
+    dey
+    bne rand_loop ; loop end
+    sta rand_seed ; store a in the seed memory address
+    cmp #$0 ; resets relevant flags
+
+    rts
+.endproc
+
+; find cursor position on background
 .proc find_cursor
 
     lda cursor_y
@@ -209,7 +271,6 @@ loadsprites:
 ; call this only after a recent find_cursor!!!
 .proc check_mine
     get_tile y_mem, x_mem
-    lda get_tile_return
     cmp #$01
     bne no_mine ; if the tile isn't ID $01, then there's no mine there. Otherwise...
     draw_tile #$9c, y_mem, x_mem ; for now, this sets the tile to M. Later, it will end the game (explosion)
@@ -311,7 +372,6 @@ b_press:
     asl
     asl
     asl
-    and #%11111000
 
     ; subtract 1, because for some reason the sprite is one pixel too low
     sec
