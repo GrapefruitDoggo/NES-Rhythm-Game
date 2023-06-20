@@ -318,7 +318,7 @@
     ldx #$00
 
     attribute_loop_1:
-        lda level_attribute, x
+        lda menu_attribute, x
         sta PPU_DATA
 
         inx

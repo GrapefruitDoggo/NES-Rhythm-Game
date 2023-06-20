@@ -31,14 +31,34 @@
 .segment "CODE"
 
 load_menu:
-;jsr wait_for_vblank
-;jsr disable_rendering
+    lda #$0 ; zero the accumulator so it's empty for future use
+    jsr wait_for_vblank
+    jsr disable_rendering
 
-;jsr draw_menu
-;jsr draw_attribute  ; the attribute table is basically where all the colour palettes get assigned to regions on the screen
-;jsr load_sprites
+    jsr draw_menu
+    jsr draw_menu_attribute  ; the attribute table is basically where all the colour palettes get assigned to regions on the screen
+
+    lda #$c0
+    sta scroll_x
+
+    jsr enable_rendering
 
 menu_loop:
+    lda nmi_ready
+    bne menu_loop ; if nmi_ready equals anything but 0, this will send us back up to game_loop - nmi_ready will be set to 0 when an NMI has occurred
+                  ; when we're not waiting for a non-maskable interrupt (NMI), we can proceed, to give us the most program time possible before the next one
+
+    set nmi_ready, #$01 ; this is a macro! they're a fun thing that ca65 has where it'll replace this with some predefined code - this one, set, is in utils.asm
+
+    ; MENU LOGIC START
+
+    jsr check_gamepad ; this basically reads the gamepad inputs and sets a bunch of things - more info in gamepad.asm
+
+    ; MENU LOGIC END
+
+    lda gamepad_new_press
+    and #%00001000      ; loop unless start button is being pressed
+    beq menu_loop
 
 set_seed:
     set rand_seed, #$53
@@ -60,9 +80,6 @@ load_level:
     lda #$0 ; zero the accumulator so it's empty for future use
     jsr wait_for_vblank
     jsr disable_rendering
-
-    lda #$c0
-    sta scroll_x
 
     jsr draw_level
     jsr draw_level_attribute  ; the attribute table is basically where all the colour palettes get assigned to regions on the screen
