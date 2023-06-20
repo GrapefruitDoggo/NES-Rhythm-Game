@@ -38,20 +38,76 @@
 
     lda PPU_STATUS        ; PPU_STATUS = $2002
 
-    ; here we're telling the ppu where on the screen to put the tile we're about to give it - first the hi bit (say $20), then the lo bit (say, idk, $21)
+    ; here we're telling the ppu where on the screen to put the tile we're about to give it - first the hi bit (say $20), then the lo bit (say, $21)
     ; which forms the two-bit address $2021 :3
     lda HI
     sta PPU_ADDR          ; PPU_ADDR = $2006
     lda LO
     sta PPU_ADDR
 
-    ; we need to set the scrollafter accessing PPU_ADDR, since doing that resets scroll back to $0 for some reason
+    ; we need to set the scroll after accessing PPU_STATUS, since doing that resets scroll back to $0 for some reason
     set PPU_SCROLL, scroll_x ; horizontal scroll
     set PPU_SCROLL, #0 ; vertical scroll
 
     lda ID  ; the id of the tile we want to draw - each 8x8 pixel square on a tilesheet counts as one 'id' in this system
     sta PPU_DATA
 .endmacro
+
+; this code retrieves the ID at 
+.macro get_tile HI, LO
+    
+    lda PPU_STATUS        ; PPU_STATUS = $2002
+
+    ; here we're telling the ppu where on the screen to find the tile we want info about - first the hi bit (say $20), then the lo bit (say, $21)
+    ; which forms the two-bit address $2021 :3
+    lda HI
+    sta PPU_ADDR          ; PPU_ADDR = $2006
+    lda LO
+    sta PPU_ADDR
+
+    ; we need to set the scroll after accessing PPU_STATUS, since doing that resets scroll back to $0 for some reason
+    set PPU_SCROLL, scroll_x ; horizontal scroll
+    set PPU_SCROLL, #0 ; vertical scroll
+
+    lda PPU_DATA
+    lda PPU_DATA  ; the id of the tile we are looking at
+    sta get_tile_return
+.endmacro
+
+
+
+; find cursor position
+.proc find_cursor
+
+    lda cursor_y
+
+    asl
+    asl
+    asl
+    asl
+    asl
+    clc
+    adc cursor_x
+    adc #$20
+    sta x_mem
+
+    lda cursor_y
+    lsr
+    lsr
+    lsr
+    tax
+
+    lda x_mem
+    and #%11110000
+    beq skip_clear_carry
+        clc
+
+    skip_clear_carry:
+    txa
+    adc #$21
+    sta y_mem
+    rts
+.endproc
 
 ; this code runs at the start of the game and basically copies everything from level.asm to ppu memory - initialising the gameboard essentially
 ; it's basically just draw_tile a bunch, but split into 4 seperate loops.
@@ -66,7 +122,7 @@
     stx PPU_ADDR          ; Low byte
 
     render_loop_1:
-        lda minesweeper, x
+        lda level, x
         ;lda title, x
         sta PPU_DATA
 
@@ -79,7 +135,7 @@
     stx PPU_ADDR          ; Low byte
 
     render_loop_2:
-        lda minesweeper+$0100, x
+        lda level+$0100, x
         ;lda title, x
         sta PPU_DATA
 
@@ -92,7 +148,7 @@
     stx PPU_ADDR          ; Low byte
 
     render_loop_3:
-        lda minesweeper+$0200, x
+        lda level+$0200, x
         ;lda title, x
         sta PPU_DATA
 
@@ -106,7 +162,7 @@
 
     ; the final loop has a few less bytes to load
     render_loop_4:
-        lda minesweeper+$0300, x
+        lda level+$0300, x
         ;lda title+$0300, x
         sta PPU_DATA
 
@@ -147,6 +203,20 @@ loadsprites:
     inx
     cpx #$A4            ; each sprite holds 4 bytes of data - Ycoord, tile, attributes and Xcoord - and there are 41 sprites, so 4*41 = 164, or $A4
     bne loadsprites
+    rts
+.endproc
+
+; call this only after a recent find_cursor!!!
+.proc check_mine
+    get_tile y_mem, x_mem
+    lda get_tile_return
+    cmp #$01
+    bne no_mine ; if the tile isn't ID $01, then there's no mine there. Otherwise...
+    draw_tile #$9c, y_mem, x_mem ; for now, this sets the tile to M. Later, it will end the game (explosion)
+    rts
+
+    no_mine:
+    draw_tile #$11, y_mem, x_mem
     rts
 .endproc
 
@@ -206,42 +276,17 @@ down_press:
     jmp down_done
 
 a_press:
-    lda cursor_y
+    jsr find_cursor
 
-    ; draw a tile at the cursor's position - will later be changed to select a tile for revealing
-    ; multiply by 32
-    asl
-    asl
-    asl
-    asl
-    asl
-    clc
-    adc cursor_x
-    adc #$20
-    sta x_mem
-
-    lda cursor_y
-    lsr
-    lsr
-    lsr
-    tax
-
-    lda x_mem
-    and #%11110000
-    beq skip_clear_carry
-        clc
-
-    skip_clear_carry:
-    txa
-    adc #$21
-    sta y_mem
-
-    draw_tile #$11, y_mem, x_mem
+    jsr check_mine
 
     jmp a_done
 
 b_press:
-    inc $201
+    jsr find_cursor
+
+    draw_tile #$01, y_mem, x_mem
+
     jmp b_done
 .endproc
 

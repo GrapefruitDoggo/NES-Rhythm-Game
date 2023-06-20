@@ -10,7 +10,6 @@
 .define CursorX $0203
 
 .segment "VARS"
-    level: .res $100
 
 .segment "IMG"
 .incbin "../assets/tiles/game_tiles.chr"
@@ -51,6 +50,8 @@ game_loop:
 
     set nmi_ready, #$01 ; this is a macro! they're a fun thing that ca65 has where it'll replace this with some predefined code - this one, set, is in utils.asm
 
+    jsr disable_rendering ; disable rendering before game logic so we can change the sprites/background freely
+
     ; GAME LOGIC START
 
     jsr check_gamepad ; this basically reads the gamepad inputs and sets a bunch of things - more info in gamepad.asm
@@ -58,5 +59,7 @@ game_loop:
     jsr button_logic
 
     ; GAME LOGIC END
+
+    jsr enable_rendering
 
     jmp game_loop

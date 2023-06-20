@@ -9,6 +9,8 @@
     cursor_y: .res 1
     x_mem: .res 1
     y_mem: .res 1
+    get_tile_return: .res 1
+    rand_seed: .res 2
 
 .segment "CODE"
 
