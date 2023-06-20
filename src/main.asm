@@ -17,6 +17,7 @@
 .include "./define/header.asm"
 .include "./lib/utils.asm"
 .include "./lib/gamepad.asm"
+.include "./lib/maths.asm"
 .include "./lib/ppu.asm"
 .include "./define/palette.asm"
 .include "./define/level.asm"
@@ -28,9 +29,14 @@
 .include "./interrupt/nmi.asm"
 
 .segment "CODE"
-; i put this right at the start of the program mostly as a hackey way to get around the fact that it takes more than one frame to draw all of this stuff
-; and i don't know enough about the NES or 6502 to really mitigate that, it should work fine though i hope :3
-gen_screen:
+
+load_menu:
+
+set_seed:
+    set rand_seed, #$53
+    set rand_seed+1, #$23
+
+load_level:
     jsr wait_for_vblank
     jsr disable_rendering
 
@@ -40,6 +46,22 @@ gen_screen:
     jsr draw_background
     jsr draw_attribute  ; the attribute table is basically where all the colour palettes get assigned to regions on the screen
     jsr load_sprites
+
+place_mines:
+    ldy #$28 ; the number of mines we want to place - 40 in decimal
+
+    try_place:
+        sty y_mem ; following function clobbers y, so we have to save it for now
+        jsr get_rand ; pick a random tile
+        ldy y_mem
+
+        get_coords_from_acc
+        get_tile y_mem, x_mem
+        cmp #$1 ; if that tile is a mine already, pick another
+        beq try_place
+    draw_tile #$1, y_mem, x_mem ; otherwise, draw a hidden mine tile...
+    dey ; ...decrement y...
+    bne try_place ; ...and return to the top of the loop
 
     jsr enable_rendering
 
