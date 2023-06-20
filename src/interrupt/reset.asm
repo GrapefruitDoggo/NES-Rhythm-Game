@@ -67,4 +67,4 @@ reset:
 
     set nmi_ready, #1
 
-    jmp gen_screen   ; start the wait loop
+    jmp load_menu
