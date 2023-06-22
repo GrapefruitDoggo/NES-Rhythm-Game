@@ -33,24 +33,66 @@
     		bne clear_ram_loop
 .endmacro
 
-; this code draws a single background tile to the screen!
-.macro draw_tile ID, HI, LO
+.proc nmi_load_tile
 
     lda PPU_STATUS        ; PPU_STATUS = $2002
 
-    ; here we're telling the ppu where on the screen to put the tile we're about to give it - first the hi bit (say $20), then the lo bit (say, $21)
+    ldx draw_tile_index
+    lda tiles_to_draw, x
+    sta PPU_ADDR
+    lda #$0
+    sta tiles_to_draw, x
+    dex
+    lda tiles_to_draw, x
+    sta PPU_ADDR
+    lda #$0
+    sta tiles_to_draw, x
+    dex
+
+    lda tiles_to_draw, x
+    sta PPU_DATA
+    lda #$0
+    sta tiles_to_draw, x
+    dex
+    
+    stx draw_tile_index
+
+.endproc
+
+.macro draw_tile_directly ID, HI, LO
+
+    lda PPU_STATUS        ; PPU_STATUS = $2002
+
+    ; here we're telling the ppu where on the screen to find the tile we want info about - first the hi bit (say $20), then the lo bit (say, $21)
     ; which forms the two-bit address $2021 :3
     lda HI
     sta PPU_ADDR          ; PPU_ADDR = $2006
     lda LO
     sta PPU_ADDR
 
-    ; we need to set the scroll after accessing PPU_STATUS, since doing that resets scroll back to $0 for some reason
-    set PPU_SCROLL, scroll_x ; horizontal scroll
-    set PPU_SCROLL, #0 ; vertical scroll
+    lda ID
+    sta PPU_DATA  ; the id of the tile we want to set
+    
+.endmacro
 
+; this code draws a single background tile to the screen!
+.macro draw_tile ID, HI, LO
+
+    inc draw_tile_index
+    ldx draw_tile_index
     lda ID  ; the id of the tile we want to draw - each 8x8 pixel square on a tilesheet counts as one 'id' in this system
-    sta PPU_DATA
+    sta tiles_to_draw, x
+
+    inc draw_tile_index
+    ldx draw_tile_index
+    lda LO
+    sta tiles_to_draw, x
+
+    inc draw_tile_index
+    ldx draw_tile_index
+    lda HI
+    sta tiles_to_draw, x
+    
 .endmacro
 
 ; this code retrieves the ID at 
@@ -64,10 +106,6 @@
     sta PPU_ADDR          ; PPU_ADDR = $2006
     lda LO
     sta PPU_ADDR
-
-    ; we need to set the scroll after accessing PPU_STATUS, since doing that resets scroll back to $0 for some reason
-    set PPU_SCROLL, scroll_x ; horizontal scroll
-    set PPU_SCROLL, #0 ; vertical scroll
 
     lda PPU_DATA
     lda PPU_DATA  ; the id of the tile we are looking at
@@ -149,8 +187,7 @@
     sta y_mem
 .endmacro
 
-.macro do_proc_on_surrounding_tiles PROC_HI, PROC_LO
-    ; do_proc_on_surrounding_tiles using count_mine
+.macro do_proc_on_surrounding_8_tiles PROC_HI, PROC_LO
     lda PROC_HI
     sta jsr_indirect_address
     lda PROC_LO
@@ -165,7 +202,25 @@
     :
     dec jsr_indirect_address+1
 
-    jsr do_proc_on_surrounding_tiles_logic
+    jsr do_proc_on_surrounding_8_tiles_logic
+.endmacro
+
+.macro do_proc_on_surrounding_4_tiles PROC_HI, PROC_LO
+    lda PROC_HI
+    sta jsr_indirect_address
+    lda PROC_LO
+    sta jsr_indirect_address+1
+
+    ; jsr_indirect will send us to the point just after the address we entered, so we need to decrement it by 1 first
+    lda jsr_indirect_address+1
+    cmp #$0
+    bne :+ ; if jsr_indirect_address+1 is 0, decrement jsr_indirect_address by 1 as well
+        dec jsr_indirect_address
+
+    :
+    dec jsr_indirect_address+1
+
+    jsr do_proc_on_surrounding_4_tiles_logic
 .endmacro
 
 ; gets a random number from the seed, and outputs the result in the a register
@@ -491,7 +546,7 @@ loadsprites:
 
 ; set x_ and y_coord_mem before using
 ; set jsr_indirect_address before using
-.proc do_proc_on_surrounding_tiles_logic
+.proc do_proc_on_surrounding_8_tiles_logic
     dec y_coord_mem ; top
     lda y_coord_mem
     cmp #$ff  ; if y_coord_mem is ff, it isn't on the board, so we skip counting whatever it's pointing to
@@ -567,6 +622,44 @@ loadsprites:
     rts
 .endproc
 
+.proc do_proc_on_surrounding_4_tiles_logic
+    dec y_coord_mem ; top
+    lda y_coord_mem
+    cmp #$ff  ; if y_coord_mem is ff, it isn't on the board, so we skip counting whatever it's pointing to
+    beq :+
+        jsr jsr_indirect
+
+    :
+    dec x_coord_mem
+    inc y_coord_mem ; left
+    lda x_coord_mem
+    cmp #$ff ; if x_coord_mem is ff, it isn't on the board, so we skip counting whatever it's pointing to
+    beq :+
+        jsr jsr_indirect
+
+    :
+    inc y_coord_mem
+    inc x_coord_mem ; bottom
+    lda y_coord_mem
+    cmp #$10 ; if y_coord_mem is 10, it isn't on the board, so we skip counting whatever it's pointing to
+    beq :+
+        jsr jsr_indirect
+
+    :
+    inc x_coord_mem
+    dec y_coord_mem ; right
+    lda x_coord_mem
+    cmp #$10 ; if x_coord_mem is 10, it isn't on the board, so we skip counting whatever it's pointing to
+    beq :+
+        jsr jsr_indirect
+
+    :
+    ; then, we reset coord_mem and mem variables
+    dec x_coord_mem
+    get_address_from_coords x_coord_mem, y_coord_mem
+    rts
+.endproc
+
 .proc tile_search
     get_tile y_mem, x_mem
     sta leapfrog
@@ -579,15 +672,15 @@ loadsprites:
         lda cursor_y
         sta y_coord_mem
 
-        ; do_proc_on_surrounding_tiles using count_mine
-        do_proc_on_surrounding_tiles #>count_mine, #<count_mine
+        ; do_proc_on_surrounding_8_tiles using count_mine
+        do_proc_on_surrounding_8_tiles #>count_mine, #<count_mine
 
         ; if there are no mines, then we'll need to search the surrounding tiles
-        ; do_proc_on_surrounding_tiles using store_tile_in_table
+        ; do_proc_on_surrounding_4_tiles using store_tile_in_table
         tya
         cmp #$0
         bne skip_store_tile
-            do_proc_on_surrounding_tiles #>store_tile_in_table, #<store_tile_in_table
+            do_proc_on_surrounding_4_tiles #>store_tile_in_table, #<store_tile_in_table
 
         skip_store_tile:
 
@@ -622,15 +715,15 @@ loadsprites:
     cmp #$10
     bne eval_not_a_hidden_tile ; if the tile id is not 10, then we can skip it, as it's no longer a tile we care about
         ldy #$0
-        ; do_proc_on_surrounding_tiles using count_mine
-        do_proc_on_surrounding_tiles #>count_mine, #<count_mine
+        ; do_proc_on_surrounding_8_tiles using count_mine
+        do_proc_on_surrounding_8_tiles #>count_mine, #<count_mine
 
         ; if there are no mines, then we'll need to search the surrounding tiles
-        ; do_proc_on_surrounding_tiles using store_tile_in_table
+        ; do_proc_on_surrounding_4_tiles using store_tile_in_table
         tya
         cmp #$0
         bne skip_store_tile
-            do_proc_on_surrounding_tiles #>store_tile_in_table, #<store_tile_in_table
+            do_proc_on_surrounding_4_tiles #>store_tile_in_table, #<store_tile_in_table
 
         skip_store_tile:
 

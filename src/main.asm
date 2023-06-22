@@ -1,4 +1,4 @@
-; TODO: finish tile search - if a tile is blank, then have all the tiles around it search themselves
+; TODO: fix screen flicker bug when evaluating/searching tiles
 ;       impliment lose condition (explosion)
 ;       impliment win condition (all mines flagged/all spaces exposed)
 ;       impliment in-game timer
@@ -18,21 +18,21 @@
 .segment "VARS"
 
 .segment "IMG"
-.incbin "../assets/tiles/game_tiles.chr"
+    .incbin "../assets/tiles/game_tiles.chr"
 
-.include "./define/header.asm"
-.include "./lib/utils.asm"
-.include "./lib/gamepad.asm"
-.include "./lib/maths.asm"
-.include "./lib/ppu.asm"
-.include "./define/palette.asm"
-.include "./define/level.asm"
-.include "./define/menu.asm"
-.include "./define/sprites.asm"
+    .include "./define/header.asm"
+    .include "./lib/utils.asm"
+    .include "./lib/gamepad.asm"
+    .include "./lib/maths.asm"
+    .include "./lib/ppu.asm"
+    .include "./define/palette.asm"
+    .include "./define/level.asm"
+    .include "./define/menu.asm"
+    .include "./define/sprites.asm"
 
-.include "./interrupt/irq.asm"              ; not currently using irq code, but it must be defined
-.include "./interrupt/reset.asm"            ; code and macros related to pressing the reset button
-.include "./interrupt/nmi.asm"
+    .include "./interrupt/irq.asm"              ; not currently using irq code, but it must be defined
+    .include "./interrupt/reset.asm"            ; code and macros related to pressing the reset button
+    .include "./interrupt/nmi.asm"
 
 .segment "CODE"
 
@@ -139,12 +139,13 @@ place_mines:
         get_tile y_mem, x_mem
         cmp #$11 ; if that tile is a mine already, pick another
         beq try_place
-    draw_tile #$11, y_mem, x_mem ; otherwise, draw a hidden mine tile...
+    draw_tile_directly #$11, y_mem, x_mem ; otherwise, draw a hidden mine tile...
     dey ; ...decrement y...
     bne try_place ; ...and return to the top of the loop
 
     lda #$ff
     sta tile_array_index
+    sta draw_tile_index
 
     jsr enable_rendering
 
@@ -155,7 +156,7 @@ game_loop:
 
     set nmi_ready, #$01 ; this is a macro! they're a fun thing that ca65 has where it'll replace this with some predefined code - this one, set, is in utils.asm
 
-    jsr disable_rendering ; disable rendering before game logic so we can change the sprites/background freely
+    jsr disable_rendering
 
     ; GAME LOGIC START
 
@@ -178,6 +179,9 @@ game_loop:
 
     ; GAME LOGIC END
 
-    jsr enable_rendering
+    set PPU_SCROLL, scroll_x ; horizontal scroll
+    set PPU_SCROLL, #0 ; vertical scroll
 
+    jsr enable_rendering
+    
     jmp game_loop
