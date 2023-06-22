@@ -1,5 +1,6 @@
 ; TODO: finish tile search - if a tile is blank, then have all the tiles around it search themselves
 ;       impliment lose condition (explosion)
+;       impliment win condition (all mines flagged/all spaces exposed)
 ;       impliment in-game timer
 ;       impliment flag placing (including top-left ticker, sprite placing, and blocking that tile from being opened)
 
@@ -142,6 +143,9 @@ place_mines:
     dey ; ...decrement y...
     bne try_place ; ...and return to the top of the loop
 
+    lda #$ff
+    sta tile_array_index
+
     jsr enable_rendering
 
 game_loop:
@@ -155,9 +159,22 @@ game_loop:
 
     ; GAME LOGIC START
 
-    jsr check_gamepad ; this basically reads the gamepad inputs and sets a bunch of things - more info in gamepad.asm
+    ; if there are tiles to evaluate, no input should be allowed
+    lda tile_array_index
+    cmp #$ff
+    bne skip_button_logic
 
-    jsr button_logic
+        jsr check_gamepad ; this basically reads the gamepad inputs and sets a bunch of things - more info in gamepad.asm
+
+        jsr button_logic
+
+        ; but, if input did happen, that means there are no tiles to evaluate and we can skip that entirely
+        jmp skip_tile_eval
+
+    skip_button_logic:
+    jsr evaluate_tile
+
+    skip_tile_eval:
 
     ; GAME LOGIC END
 

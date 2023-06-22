@@ -149,6 +149,25 @@
     sta y_mem
 .endmacro
 
+.macro do_proc_on_surrounding_tiles PROC_HI, PROC_LO
+    ; do_proc_on_surrounding_tiles using count_mine
+    lda PROC_HI
+    sta jsr_indirect_address
+    lda PROC_LO
+    sta jsr_indirect_address+1
+
+    ; jsr_indirect will send us to the point just after the address we entered, so we need to decrement it by 1 first
+    lda jsr_indirect_address+1
+    cmp #$0
+    bne :+ ; if jsr_indirect_address+1 is 0, decrement jsr_indirect_address by 1 as well
+        dec jsr_indirect_address
+
+    :
+    dec jsr_indirect_address+1
+
+    jsr do_proc_on_surrounding_tiles_logic
+.endmacro
+
 ; gets a random number from the seed, and outputs the result in the a register
 .proc get_rand
 
@@ -378,8 +397,8 @@ loadsprites:
     get_tile y_mem, x_mem
     cmp #$11
     bne no_mine ; if the tile isn't ID $01, then there's no mine there. Otherwise...
-    draw_tile #$9c, y_mem, x_mem ; for now, this sets the tile to M. Later, it will end the game (explosion)
-    rts
+        draw_tile #$9c, y_mem, x_mem ; for now, this sets the tile to M. Later, it will end the game (explosion)
+        rts
 
     no_mine:
     jsr tile_search
@@ -396,11 +415,163 @@ loadsprites:
     rts
 .endproc
 
+.proc check_tile_table_for_duplicates
+    lda tile_array_index
+    cmp #$ff
+    beq skip_check_dupes
+        ldx tile_array_index
+        check_dupes_loop:
+            ; reset dupe flag
+            lda #$0
+            sta dupe_flag
+
+            ; odd, y coord
+            lda y_coord_mem
+            cmp tile_array, x
+            bne :+
+                inc dupe_flag
+
+            :
+            dex
+            ; even, x coord
+            lda x_coord_mem
+            cmp tile_array, x
+            bne :+
+                inc dupe_flag
+
+            :
+            lda dupe_flag
+            cmp #$2 ; if we've found a dupe, exit the loop
+            bne :+
+                rts
+
+            :
+            dex
+            txa
+            cmp #$ff
+            bne check_dupes_loop
+    skip_check_dupes:
+    rts
+.endproc
+
+.proc store_tile_in_table
+    jsr check_tile_table_for_duplicates
+    lda dupe_flag
+    cmp #$2
+    beq :+
+        ; put the tile's two-byte coordinates into the table so we can assess them next frame
+        inc tile_array_index
+        lda x_coord_mem
+        ldx tile_array_index
+        sta tile_array, x
+
+        inc tile_array_index
+        lda y_coord_mem
+        ldx tile_array_index
+        sta tile_array, x
+
+    :
+
+    ; reset dupe flag
+    lda #$0
+    sta dupe_flag
+    rts
+.endproc
+
+; simulated jsr to a location specified in code
+; set jsr_indirect_address before using
+.proc jsr_indirect
+    ; we perform some magic and trick the processor into thinking we came from the place we want to go "back" to
+    lda jsr_indirect_address
+    pha
+    lda jsr_indirect_address+1
+    pha
+    rts
+.endproc
+
+; set x_ and y_coord_mem before using
+; set jsr_indirect_address before using
+.proc do_proc_on_surrounding_tiles_logic
+    dec y_coord_mem ; top
+    lda y_coord_mem
+    cmp #$ff  ; if y_coord_mem is ff, it isn't on the board, so we skip counting whatever it's pointing to
+    beq :+
+        jsr jsr_indirect
+
+    :
+    dec x_coord_mem ; top left
+    lda x_coord_mem
+    cmp #$ff ; if x_coord_mem is ff, it isn't on the board, so we skip counting whatever it's pointing to
+    beq :+
+    lda y_coord_mem
+    cmp #$ff ; if x_coord_mem is ff, it isn't on the board, so we skip counting whatever it's pointing to
+    beq :+
+        jsr jsr_indirect
+
+    :
+    inc y_coord_mem ; left
+    lda x_coord_mem
+    cmp #$ff ; if x_coord_mem is ff, it isn't on the board, so we skip counting whatever it's pointing to
+    beq :+
+        jsr jsr_indirect
+
+    :
+    inc y_coord_mem ; bottom left
+    lda y_coord_mem
+    cmp #$10 ; if y_coord_mem is 10, it isn't on the board, so we skip counting whatever it's pointing to
+    beq :+
+    lda x_coord_mem
+    cmp #$ff ; if x_coord_mem is ff, it isn't on the board, so we skip counting whatever it's pointing to
+    beq :+
+        jsr jsr_indirect
+
+    :
+    inc x_coord_mem ; bottom
+    lda y_coord_mem
+    cmp #$10 ; if y_coord_mem is 10, it isn't on the board, so we skip counting whatever it's pointing to
+    beq :+
+        jsr jsr_indirect
+
+    :
+    inc x_coord_mem ; bottom right
+    lda x_coord_mem
+    cmp #$10 ; if x_coord_mem is 10, it isn't on the board, so we skip counting whatever it's pointing to
+    beq :+
+    lda y_coord_mem
+    cmp #$10 ; if y_coord_mem is 10, it isn't on the board, so we skip counting whatever it's pointing to
+    beq :+
+        jsr jsr_indirect
+
+    :
+    dec y_coord_mem ; right
+    lda x_coord_mem
+    cmp #$10 ; if x_coord_mem is 10, it isn't on the board, so we skip counting whatever it's pointing to
+    beq :+
+        jsr jsr_indirect
+
+    :
+    dec y_coord_mem ; top right
+    lda y_coord_mem
+    cmp #$ff ; if y_coord_mem is ff, it isn't on the board, so we skip counting whatever it's pointing to
+    beq :+
+    lda x_coord_mem
+    cmp #$10 ; if x_coord_mem is 10, it isn't on the board, so we skip counting whatever it's pointing to
+    beq :+
+        jsr jsr_indirect
+
+    :
+    ; then, we reset coord_mem and mem variables
+    dec x_coord_mem
+    inc y_coord_mem
+    get_address_from_coords x_coord_mem, y_coord_mem
+    rts
+.endproc
+
 .proc tile_search
     get_tile y_mem, x_mem
     sta leapfrog
     cmp #$10
-    bne not_a_hidden_tile1 ; if the tile id is not 10, then we can skip it, as it's not a tile we care about
+    bne not_a_hidden_tile ; if the tile id is not 10, then we can skip it, as it's not a tile we care about
         ; otherwise, look at all the tiles surrounding this one and count how many are mines
         ldy #$0
         lda cursor_x
@@ -408,91 +579,69 @@ loadsprites:
         lda cursor_y
         sta y_coord_mem
 
-        dec y_coord_mem ; top
-        lda y_coord_mem
-        cmp #$ff  ; if y_coord_mem is ff, it isn't on the board, so we skip counting whatever it's pointing to
-        beq :+
-            jsr count_mine
+        ; do_proc_on_surrounding_tiles using count_mine
+        do_proc_on_surrounding_tiles #>count_mine, #<count_mine
 
-        :
-        dec x_coord_mem ; top left
-        lda x_coord_mem
-        cmp #$ff ; if x_coord_mem is ff, it isn't on the board, so we skip counting whatever it's pointing to
-        beq :+
-        lda y_coord_mem
-        cmp #$ff ; if x_coord_mem is ff, it isn't on the board, so we skip counting whatever it's pointing to
-        beq :+
-            jsr count_mine
-
-        :
-        inc y_coord_mem ; left
-        lda x_coord_mem
-        cmp #$ff ; if x_coord_mem is ff, it isn't on the board, so we skip counting whatever it's pointing to
-        beq :+
-            jsr count_mine
-
-        :
-        inc y_coord_mem ; bottom left
-        lda y_coord_mem
-        cmp #$10 ; if y_coord_mem is 10, it isn't on the board, so we skip counting whatever it's pointing to
-        beq :+
-        lda x_coord_mem
-        cmp #$ff ; if x_coord_mem is ff, it isn't on the board, so we skip counting whatever it's pointing to
-        beq :+
-            jsr count_mine
-
-        :
-        inc x_coord_mem ; bottom
-        lda y_coord_mem
-        cmp #$10 ; if y_coord_mem is 10, it isn't on the board, so we skip counting whatever it's pointing to
-        beq :+
-            jsr count_mine
-
-        :
-        inc x_coord_mem ; bottom right
-        lda x_coord_mem
-        cmp #$10 ; if x_coord_mem is 10, it isn't on the board, so we skip counting whatever it's pointing to
-        beq :+
-        lda y_coord_mem
-        cmp #$10 ; if y_coord_mem is 10, it isn't on the board, so we skip counting whatever it's pointing to
-        beq :+
-            jsr count_mine
-
-        :
-    not_a_hidden_tile1:
-    lda leapfrog
-    cmp #$10
-    bne not_a_hidden_tile2
-
-        dec y_coord_mem ; right
-        lda x_coord_mem
-        cmp #$10 ; if x_coord_mem is 10, it isn't on the board, so we skip counting whatever it's pointing to
-        beq :+
-            jsr count_mine
-
-        :
-        dec y_coord_mem ; top right
-        lda y_coord_mem
-        cmp #$ff ; if y_coord_mem is ff, it isn't on the board, so we skip counting whatever it's pointing to
-        beq :+
-        lda x_coord_mem
-        cmp #$10 ; if x_coord_mem is 10, it isn't on the board, so we skip counting whatever it's pointing to
-        beq :+
-            jsr count_mine
-
-        :
-        ; then, we reset coord_mem and mem variables...
-        dec x_coord_mem
-        inc y_coord_mem
-        get_address_from_coords x_coord_mem, y_coord_mem
-
-        ; ...and draw a tile with an offset equal to the number of mines
+        ; if there are no mines, then we'll need to search the surrounding tiles
+        ; do_proc_on_surrounding_tiles using store_tile_in_table
         tya
+        cmp #$0
+        bne skip_store_tile
+            do_proc_on_surrounding_tiles #>store_tile_in_table, #<store_tile_in_table
+
+        skip_store_tile:
+
+        ; finally, we draw a tile with an offset equal to the number of mines
+        tya
+        clc
         adc #$40
         sta inter
         draw_tile inter, y_mem, x_mem
 
-    not_a_hidden_tile2:
+    not_a_hidden_tile:
+    rts
+.endproc
+
+.proc evaluate_tile
+    ldx tile_array_index
+    lda tile_array, x
+    sta y_coord_mem
+    lda #$0
+    sta tile_array, x
+    dec tile_array_index
+
+    ldx tile_array_index
+    lda tile_array, x
+    sta x_coord_mem
+    lda #$0
+    sta tile_array, x
+    dec tile_array_index
+
+    get_address_from_coords x_coord_mem, y_coord_mem
+    get_tile y_mem, x_mem
+    cmp #$10
+    bne eval_not_a_hidden_tile ; if the tile id is not 10, then we can skip it, as it's no longer a tile we care about
+        ldy #$0
+        ; do_proc_on_surrounding_tiles using count_mine
+        do_proc_on_surrounding_tiles #>count_mine, #<count_mine
+
+        ; if there are no mines, then we'll need to search the surrounding tiles
+        ; do_proc_on_surrounding_tiles using store_tile_in_table
+        tya
+        cmp #$0
+        bne skip_store_tile
+            do_proc_on_surrounding_tiles #>store_tile_in_table, #<store_tile_in_table
+
+        skip_store_tile:
+
+        ; finally, we draw a tile with an offset equal to the number of mines
+        tya
+        clc
+        adc #$40
+        sta inter
+        draw_tile inter, y_mem, x_mem
+
+    eval_not_a_hidden_tile:
     rts
 .endproc
 
@@ -559,6 +708,9 @@ a_press:
     jmp a_done
 
 b_press:
+    jsr find_cursor
+
+    draw_tile #$11, y_mem, x_mem
 
     jmp b_done
 .endproc
