@@ -111,6 +111,23 @@
     lda PPU_DATA  ; the id of the tile we are looking at
 .endmacro
 
+.macro move_sprite ID, X_POS, Y_POS
+
+    lda ID
+    clc
+    adc #$1
+    asl
+    asl
+    sta sprite_to_move
+
+    lda X_POS
+    sta sprite_to_move+1
+
+    lda Y_POS
+    sta sprite_to_move+2
+
+.endmacro
+
 ; gets tile coordinates from the number in the accumulator
 .macro get_address_from_acc
 
@@ -801,11 +818,118 @@ a_press:
     jmp a_done
 
 b_press:
-    jsr find_cursor
+    lda #$0
+    sta dupe_flag
+    
+    lda flags_placed
+    beq :+
+        jsr find_and_remove_sprite
 
-    draw_tile #$11, y_mem, x_mem
+    :
+    lda dupe_flag
+    cmp #$02
+    beq :+
+        move_sprite flags_placed, cursor_x, cursor_y
+        inc flags_placed
 
+    :
     jmp b_done
+.endproc
+
+.proc find_and_remove_sprite
+
+    ldx #$4
+
+    find_sprite_loop:
+        lda #$0
+        sta dupe_flag
+
+        lsr
+        lsr
+        cmp flags_placed
+        beq find_sprite_loop_end
+
+        lda $0200, x
+        cmp $0200
+        bne :+
+            inc dupe_flag
+
+        :
+        inx
+        inx
+        inx
+        lda $0200, x
+        cmp $0203
+        bne :+
+            inc dupe_flag
+        
+        :
+
+        lda dupe_flag
+        cmp #$02
+        bne :+
+            dex
+            dex
+            dex
+            txa
+            lsr
+            lsr
+            sta x_mem
+            dec x_mem
+            move_sprite x_mem, #$f8, #$f7
+            dec flags_placed
+            jmp find_sprite_loop_end
+
+        :
+        inx
+
+        txa
+        bne find_sprite_loop
+    find_sprite_loop_end:
+    rts
+
+.endproc
+
+.proc nmi_move_sprite
+
+    lda sprite_to_move
+    beq :+
+        lda sprite_to_move+2
+
+        ; offset of 9 "tiles" to make Y_POS = 0 the topmost tile
+        clc
+        adc #$9
+
+        ; multiply by 8
+        asl
+        asl
+        asl
+
+        ; subtract 1, because for some reason the sprite is one pixel too low
+        sec
+        sbc #$01
+
+        ldx sprite_to_move
+        sta $0200, x
+
+        lda sprite_to_move+1
+
+        ; offset of 8 "tiles" to make X_POS = 0 the leftmost tile
+        clc
+        adc #$8
+
+        ; multiply by 8
+        asl
+        asl
+        asl
+        and #%11111000
+    
+        inx
+        inx
+        inx
+        sta $0200, x
+    :
+    rts
 .endproc
 
 .proc update_cursor_sprite

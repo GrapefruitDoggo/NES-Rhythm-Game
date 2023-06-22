@@ -22,6 +22,8 @@
     dupe_flag: .res 1
     tiles_to_draw: .res 45 ; tile to be drawn next frame, ID(1st bit), LO(2nd bit), HI(3rd bit)
     draw_tile_index: .res 1 ; number of tiles in tiles_to_draw * 3 (starts at #$ff because it's an offset, so we want the first tile to be at address 0)
+    sprite_to_move: .res 3 ; sprite to be moved next frame, OFFSET_ID(1st bit), X_POS(2nd bit), Y_POS(3rd bit)
+    flags_placed: .res 1
 
 .segment "CODE"
 
@@ -40,13 +42,15 @@ nmi:
         jsr nmi_load_tile
 
     :
-    set PPU_SCROLL, scroll_x ; horizontal scroll
-    set PPU_SCROLL, #0 ; vertical scroll
-
     jsr enable_rendering
 
     ; set the cursor metasprite with a proc
     jsr update_cursor_sprite
+    jsr nmi_move_sprite
+    ldy #$0
+
+    set PPU_SCROLL, scroll_x ; horizontal scroll
+    set PPU_SCROLL, #0 ; vertical scroll
 
     lda PPU_STATUS ; $2002
 
