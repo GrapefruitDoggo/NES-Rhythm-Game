@@ -7,6 +7,7 @@
     sprite_logger: .res 8
     cursor_x: .res 1
     cursor_y: .res 1
+    a_mem: .res 1
     x_mem: .res 1
     y_mem: .res 1
     x_coord_mem: .res 1
@@ -24,6 +25,8 @@
     draw_tile_index: .res 1 ; number of tiles in tiles_to_draw * 3 (starts at #$ff because it's an offset, so we want the first tile to be at address 0)
     sprite_to_move: .res 3 ; sprite to be moved next frame, OFFSET_ID(1st bit), X_POS(2nd bit), Y_POS(3rd bit)
     flags_placed: .res 1
+    flags_placed_last: .res 1 ; value of flags_placed last frame
+    flags_remaining_display: .res 3 ; 100ths digit (1st bit), 10ths digit (2nd bit), 1s digit (3rd bit)
 
 .segment "CODE"
 
@@ -36,10 +39,40 @@ nmi:
         rti
     nmi_go:
 
+    ; update our two counters if they have changed
+    lda flags_placed
+    cmp flags_placed_last
+    beq time_elapsed
+
+    flags_remaining:
+        lda #$0
+        sta flags_remaining_display
+        sta flags_remaining_display+1
+        sta flags_remaining_display+2
+
+        lda #40
+        sec
+        sbc flags_placed ; invert flags placed, where 0 is 40 and 40 is 0
+        sta inter
+    
+        binary_to_decimal3 inter, flags_remaining_display
+
+        ldx #$c1
+        ldy #$20
+        lda #<flags_remaining_display
+        jsr update_counter
+
+    time_elapsed:
+        ; TODO: time counter
+
+    nmi_draw_tiles:
     lda draw_tile_index
     cmp #$ff
     beq :+
         jsr nmi_load_tile
+        lda draw_tile_index
+        cmp #$ff
+        bne nmi_draw_tiles
 
     :
     jsr enable_rendering
@@ -48,6 +81,10 @@ nmi:
     jsr update_cursor_sprite
     jsr nmi_move_sprite
     ldy #$0
+
+    ; set last frame variables
+    lda flags_placed
+    sta flags_placed_last
 
     set PPU_SCROLL, scroll_x ; horizontal scroll
     set PPU_SCROLL, #0 ; vertical scroll

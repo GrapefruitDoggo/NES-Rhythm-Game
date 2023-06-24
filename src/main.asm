@@ -2,7 +2,7 @@
 ;       impliment lose condition (explosion)
 ;       impliment win condition (all mines flagged/all spaces exposed)
 ;       impliment in-game timer
-;       impliment flag placing (including top-left ticker, ~~sprite placing~~, and blocking that tile from being opened)
+;       impliment flag placing (~~including top-left ticker~~, ~~sprite placing~~, and blocking that tile from being opened)
 
 ; lots of this code (and some of the comments) isn't mine, mostly because i didn't want to spend half a year learning the 6502 architecture and nes mapping before i could even
 ; start writing a game - i learn better by actually trying to code something :3
@@ -146,6 +146,8 @@ place_mines:
     lda #$ff
     sta tile_array_index
     sta draw_tile_index
+
+    sta flags_placed_last
 
     lda #$0
     sta sprite_to_move

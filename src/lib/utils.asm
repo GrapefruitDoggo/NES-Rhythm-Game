@@ -56,6 +56,7 @@
     dex
     
     stx draw_tile_index
+    rts
 
 .endproc
 
@@ -239,6 +240,181 @@
 
     jsr do_proc_on_surrounding_4_tiles_logic
 .endmacro
+
+; turns a binary number into a 3-digit representation of that number
+.macro binary_to_decimal3 NUM, ARRAY_OUT
+
+    clc
+
+    lda NUM
+
+    hundreds_loop:
+        cmp #100
+        bcc tens_loop ; if NUM is less than 100, we have no more hundreds to count
+
+        sec
+        sbc #100
+        inc ARRAY_OUT
+        jmp hundreds_loop
+
+    tens_loop:
+        cmp #10
+        bcc ones_loop ; if NUM is less than 10, we have no more tens to count
+
+        sec
+        sbc #10
+        inc ARRAY_OUT+1
+        jmp tens_loop
+
+    ones_loop:
+        cmp #1
+        bcc decimal_counting_loop_end ; if NUM is less than 1, we have no more to do
+
+        sec
+        sbc #1
+        inc ARRAY_OUT+2
+        jmp ones_loop
+
+    decimal_counting_loop_end:
+
+.endmacro
+
+; accepts a 3-digit number (array with three slots) and a background tile address
+; store 3-digit number's address in A register
+; store the background tile address HI bit in Y register
+; store the background tile address LO bit in X register
+.proc update_counter
+
+    sta a_mem
+    stx x_mem
+    sty y_mem
+
+    ; hundreds
+    ; top tile
+    ldx a_mem
+    lda $00, x
+    inx
+    stx a_mem
+    clc
+    adc #$02
+    sta inter
+
+    draw_tile inter, y_mem, x_mem
+
+    ; bottom tile
+    lda y_mem
+    pha
+    lda x_mem
+    pha
+    clc
+    adc #$20
+    bcc :+
+        inc y_mem
+
+    :
+    sta x_mem
+
+    lda inter
+    clc
+    adc #$10
+    sta inter
+
+    draw_tile inter, y_mem, x_mem
+    
+    pla
+    sta x_mem
+    pla
+    sta y_mem
+
+    ; tens
+    ; top tile
+    clc
+    inc x_mem
+    bcc :+
+        inc y_mem
+
+    :
+
+    ldx a_mem
+    lda $00, x
+    inx
+    stx a_mem
+    clc
+    adc #$02
+
+    sta inter
+    draw_tile inter, y_mem, x_mem
+
+    ; bottom tile
+    lda y_mem
+    pha
+    lda x_mem
+    pha
+    clc
+    adc #$20
+    bcc :+
+        inc y_mem
+
+    :
+    sta x_mem
+
+    lda inter
+    clc
+    adc #$10
+    sta inter
+
+    draw_tile inter, y_mem, x_mem
+    
+    pla
+    sta x_mem
+    pla
+    sta y_mem
+
+    ; ones
+    ; top tile
+    clc
+    inc x_mem
+    bcc :+
+        inc y_mem
+
+    :
+
+    ldx a_mem
+    lda $00, x
+    clc
+    adc #$02
+
+    sta inter
+    draw_tile inter, y_mem, x_mem
+
+    ; bottom tile
+    lda y_mem
+    pha
+    lda x_mem
+    pha
+    clc
+    adc #$20
+    bcc :+
+        inc y_mem
+
+    :
+    sta x_mem
+
+    lda inter
+    clc
+    adc #$10
+    sta inter
+
+    draw_tile inter, y_mem, x_mem
+    
+    pla
+    sta x_mem
+    pla
+    sta y_mem
+    
+    rts
+
+.endproc
 
 ; gets a random number from the seed, and outputs the result in the a register
 .proc get_rand
@@ -468,9 +644,9 @@ loadsprites:
 .proc check_tile_for_mine
     get_tile y_mem, x_mem
     cmp #$11
-    bne no_mine ; if the tile isn't ID $01, then there's no mine there. Otherwise...
-        draw_tile #$9c, y_mem, x_mem ; for now, this sets the tile to M. Later, it will end the game (explosion)
-        rts
+    bne no_mine ; if the tile isn't ID $11, then there's no mine there. Otherwise...
+        jsr wait_for_vblank
+        jmp reset
 
     no_mine:
     jsr tile_search
@@ -679,7 +855,6 @@ loadsprites:
 
 .proc tile_search
     get_tile y_mem, x_mem
-    sta leapfrog
     cmp #$10
     bne not_a_hidden_tile ; if the tile id is not 10, then we can skip it, as it's not a tile we care about
         ; otherwise, look at all the tiles surrounding this one and count how many are mines
@@ -697,7 +872,7 @@ loadsprites:
         tya
         cmp #$0
         bne skip_store_tile
-            do_proc_on_surrounding_4_tiles #>store_tile_in_table, #<store_tile_in_table
+            do_proc_on_surrounding_8_tiles #>store_tile_in_table, #<store_tile_in_table
 
         skip_store_tile:
 
@@ -740,7 +915,7 @@ loadsprites:
         tya
         cmp #$0
         bne skip_store_tile
-            do_proc_on_surrounding_4_tiles #>store_tile_in_table, #<store_tile_in_table
+            do_proc_on_surrounding_8_tiles #>store_tile_in_table, #<store_tile_in_table
 
         skip_store_tile:
 
@@ -821,11 +996,11 @@ b_press:
     lda #$0
     sta dupe_flag
     
-    lda flags_placed
-    beq :+
-        jsr find_and_remove_sprite
+    jsr find_and_remove_sprite ; this automatically exits the loop if there are no flags left to place
 
-    :
+    lda flags_placed
+    cmp #40
+    beq :+
     lda dupe_flag
     cmp #$02
     beq :+
@@ -844,8 +1019,11 @@ b_press:
         lda #$0
         sta dupe_flag
 
+        txa
         lsr
         lsr
+        sec
+        sbc #$01
         cmp flags_placed
         beq find_sprite_loop_end
 
@@ -883,7 +1061,6 @@ b_press:
         :
         inx
 
-        txa
         bne find_sprite_loop
     find_sprite_loop_end:
     rts
