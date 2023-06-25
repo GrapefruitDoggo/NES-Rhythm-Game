@@ -38,6 +38,12 @@ cd ..
 # --setup--
 echo "Setting up..."
 
+# create info and info/nes directories if they don't exist
+if ! test -d "build/info/nes"; then
+    mkdir build/info/
+    mkdir build/info/nes/
+fi
+
 # rename current build files if they exist, so we can bring them back if the new build fails
 if test -f build/NES-Mines.nes; then
     mv build/NES-Mines.nes build/NES-Mines.nes.backup

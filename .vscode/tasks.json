@@ -7,32 +7,6 @@
             "label": "Build NES project",
             "type": "shell",
             "command": "cd build/scripts\n./build.sh\nmesen ../NES-Mines.nes",
-            "problemMatcher": [
-                {
-		    "owner": "nesdev",
-                    "pattern": [
-                        {
-                            "regexp": "^([^:]*):([0-9]+): ?([^:]*): ?(.*)$",
-                            "file": 1,
-                            "location": 2,
-                            "severity": 3,
-                            "message": 4
-                        }
-                    ]
-                },
-                {
-		    "owner": "nesdev",
-                    "pattern": [
-                        {
-                            "regexp": "^([^:]*)\\(([0-9]+)\\): ?([^:]*): ?(.*)$",
-                            "file": 1,
-                            "location": 2,
-                            "severity": 3,
-                            "message": 4
-                        }
-                    ]
-                }
-            ],
             "group": {
                 "kind": "build",
                 "isDefault": true
