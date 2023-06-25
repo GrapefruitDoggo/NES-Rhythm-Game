@@ -27,6 +27,8 @@
     flags_placed: .res 1
     flags_placed_last: .res 1 ; value of flags_placed last frame
     flags_remaining_display: .res 3 ; 100ths digit (1st bit), 10ths digit (2nd bit), 1s digit (3rd bit)
+    win_flag: .res 1
+    lose_flag: .res 1
 
 .segment "CODE"
 

@@ -140,7 +140,10 @@
 
     ; find Y coord
     lda y_mem
-    divide_acc_by_16
+    lsr
+    lsr
+    lsr
+    lsr
     sta y_mem
 
     ; following is based on find_cursor
@@ -221,24 +224,6 @@
     dec jsr_indirect_address+1
 
     jsr do_proc_on_surrounding_8_tiles_logic
-.endmacro
-
-.macro do_proc_on_surrounding_4_tiles PROC_HI, PROC_LO
-    lda PROC_HI
-    sta jsr_indirect_address
-    lda PROC_LO
-    sta jsr_indirect_address+1
-
-    ; jsr_indirect will send us to the point just after the address we entered, so we need to decrement it by 1 first
-    lda jsr_indirect_address+1
-    cmp #$0
-    bne :+ ; if jsr_indirect_address+1 is 0, decrement jsr_indirect_address by 1 as well
-        dec jsr_indirect_address
-
-    :
-    dec jsr_indirect_address+1
-
-    jsr do_proc_on_surrounding_4_tiles_logic
 .endmacro
 
 ; turns a binary number into a 3-digit representation of that number
@@ -470,6 +455,27 @@
     rts
 .endproc
 
+.proc draw_face
+
+    sta a_mem
+    draw_tile a_mem, #$20, #$c7
+
+    inc a_mem
+    draw_tile a_mem, #$20, #$c8
+
+    lda a_mem
+    clc
+    adc #$0f
+    sta a_mem
+    draw_tile a_mem, #$20, #$e7
+
+    inc a_mem
+    draw_tile a_mem, #$20, #$e8
+
+    rts
+
+.endproc
+
 ; this code runs at the start of the game and basically copies everything from level.asm to ppu memory - initialising the gameboard essentially
 ; it's basically just draw_tile a bunch, but split into 4 seperate loops.
 .proc draw_level
@@ -640,17 +646,102 @@ loadsprites:
     rts
 .endproc
 
+.proc check_flags_for_mines
+
+    ldx #$4
+    ldy #$0
+
+    check_under_flags_loop:
+        lda $0200, x
+        sec
+        sbc #$47
+        lsr
+        lsr
+        lsr
+        sta y_mem
+        inx
+        inx
+        inx
+        lda $0200, x
+        sec
+        sbc #$40
+        lsr
+        lsr
+        lsr
+        sta x_mem
+        inx
+
+        txa
+        pha
+        get_address_from_coords x_mem, y_mem
+        pla
+        tax
+
+        get_tile y_mem, x_mem
+        cmp #$11
+        bne :+
+            iny
+
+        :
+
+        txa
+        lsr
+        lsr
+        cmp #41
+        bne check_under_flags_loop
+    rts
+
+.endproc
+
 ; call this only after a recent find_cursor!!!
 .proc check_tile_for_mine
     get_tile y_mem, x_mem
     cmp #$11
     bne no_mine ; if the tile isn't ID $11, then there's no mine there. Otherwise...
-        jsr wait_for_vblank
-        jmp reset
+        lda #$01
+        sta lose_flag
+        draw_tile #$01, y_mem, x_mem
+        rts
 
     no_mine:
     jsr tile_search
     rts
+.endproc
+
+.proc explode_mines
+
+    ldy #$0
+    lda #$0
+
+    explode_mines_loop:
+        get_address_from_acc
+        dec x_mem
+        lda x_mem
+        cmp #$ff
+        bne:+
+            dec y_mem
+
+        :
+        lda PPU_STATUS
+
+        lda y_mem
+        sta PPU_ADDR
+        lda x_mem
+        sta PPU_ADDR
+
+        lda PPU_DATA
+        lda PPU_DATA
+        cmp #$11
+        bne :+
+            draw_tile_directly #$01, y_mem, x_mem
+
+        :
+        iny
+        tya
+        bne explode_mines_loop
+    
+    rts
+
 .endproc
 
 .proc count_mine
@@ -815,44 +906,6 @@ loadsprites:
     rts
 .endproc
 
-.proc do_proc_on_surrounding_4_tiles_logic
-    dec y_coord_mem ; top
-    lda y_coord_mem
-    cmp #$ff  ; if y_coord_mem is ff, it isn't on the board, so we skip counting whatever it's pointing to
-    beq :+
-        jsr jsr_indirect
-
-    :
-    dec x_coord_mem
-    inc y_coord_mem ; left
-    lda x_coord_mem
-    cmp #$ff ; if x_coord_mem is ff, it isn't on the board, so we skip counting whatever it's pointing to
-    beq :+
-        jsr jsr_indirect
-
-    :
-    inc y_coord_mem
-    inc x_coord_mem ; bottom
-    lda y_coord_mem
-    cmp #$10 ; if y_coord_mem is 10, it isn't on the board, so we skip counting whatever it's pointing to
-    beq :+
-        jsr jsr_indirect
-
-    :
-    inc x_coord_mem
-    dec y_coord_mem ; right
-    lda x_coord_mem
-    cmp #$10 ; if x_coord_mem is 10, it isn't on the board, so we skip counting whatever it's pointing to
-    beq :+
-        jsr jsr_indirect
-
-    :
-    ; then, we reset coord_mem and mem variables
-    dec x_coord_mem
-    get_address_from_coords x_coord_mem, y_coord_mem
-    rts
-.endproc
-
 .proc tile_search
     get_tile y_mem, x_mem
     cmp #$10
@@ -868,7 +921,7 @@ loadsprites:
         do_proc_on_surrounding_8_tiles #>count_mine, #<count_mine
 
         ; if there are no mines, then we'll need to search the surrounding tiles
-        ; do_proc_on_surrounding_4_tiles using store_tile_in_table
+        ; do_proc_on_surrounding_8_tiles using store_tile_in_table
         tya
         cmp #$0
         bne skip_store_tile
@@ -911,7 +964,7 @@ loadsprites:
         do_proc_on_surrounding_8_tiles #>count_mine, #<count_mine
 
         ; if there are no mines, then we'll need to search the surrounding tiles
-        ; do_proc_on_surrounding_4_tiles using store_tile_in_table
+        ; do_proc_on_surrounding_8_tiles using store_tile_in_table
         tya
         cmp #$0
         bne skip_store_tile

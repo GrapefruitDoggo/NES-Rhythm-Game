@@ -1,8 +1,5 @@
 ; TODO: fix screen flicker bug when evaluating/searching tiles
-;       impliment lose condition (explosion)
-;       impliment win condition (all mines flagged/all spaces exposed)
 ;       impliment in-game timer
-;       impliment flag placing (~~including top-left ticker~~, ~~sprite placing~~, and blocking that tile from being opened)
 
 ; lots of this code (and some of the comments) isn't mine, mostly because i didn't want to spend half a year learning the 6502 architecture and nes mapping before i could even
 ; start writing a game - i learn better by actually trying to code something :3
@@ -170,10 +167,51 @@ game_loop:
     cmp #$ff
     bne skip_button_logic
 
+        lda win_flag ; check if the player has already won
+        bne :+
+            lda flags_placed ; then, if 40 flags are placed, check if they're all on the correct squares
+            cmp #40
+            bne :+
+                jsr check_flags_for_mines
+                tya
+                cmp #40
+                bne :+
+                    sta win_flag
+                    lda #$24
+                    jsr draw_face
+                    jmp skip_tile_eval
+
+        :
+
+        lda lose_flag ; check if the player has potentially lost
+        beq :+
+            cmp #$01
+            bne :+
+                inc lose_flag
+                jsr explode_mines
+                lda #$26
+                jsr draw_face
+                jmp skip_tile_eval
+
+        :
         jsr check_gamepad ; this basically reads the gamepad inputs and sets a bunch of things - more info in gamepad.asm
 
+        lda win_flag
+        bne game_end_controls
+        lda lose_flag
+        cmp #$02
+        beq game_end_controls
+            
         jsr button_logic
+        jmp :+
 
+        game_end_controls:
+            lda gamepad_new_press
+            and #%00001111      ; restart when start, select, A, or B button has been pressed
+            beq :+
+                jmp reset
+
+        :
         ; but, if input did happen, that means there are no tiles to evaluate and we can skip that entirely
         jmp skip_tile_eval
 
