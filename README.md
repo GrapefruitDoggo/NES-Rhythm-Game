@@ -42,7 +42,7 @@ My intention for this project is mostly as a learning exercise for myself. I wan
 ####
 I'm not sure exactly what I want to make for my next NES project (likely something rhythm-based, or some kind of bullet hell or roguelike), but I do know I'll have a lot of fun making it!
 ####
-A secondary intention for this project is using as a finished project on my portfolio, as I have vanishingly few of those to my name (at time of writing). If you're here from [my website](smallcode.dev), welcome! I hope you like what you see!
+A secondary intention for this project is using as a finished project on my portfolio, as I have vanishingly few of those to my name (at time of writing). If you're here from [my website](https://www.smallcode.dev), welcome! I hope you like what you see!
 
 ---
 
