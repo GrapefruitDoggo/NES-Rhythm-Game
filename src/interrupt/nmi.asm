@@ -16,7 +16,7 @@
     timer: .res 1
     inter: .res 1
     leapfrog: .res 1
-    tile_array: .res 140 ; the maximun number of tiles we would ever need to search is 28,
+    tile_array: .res 160 ; the maximun number of tiles we would ever need to search is 28,
                          ; and each tile needs an x (1st bit) and y(2nd bit) value to be stored to be evaluated
     tile_array_index: .res 1 ; number of tiles in tile_array * 2 (starts at #$ff because it's an offset, so we want the first tile to be at address 0)
     jsr_indirect_address: .res 2
