@@ -1,4 +1,4 @@
-cc65/
+.vscode
 build/info/
 *.nes
 *.o
