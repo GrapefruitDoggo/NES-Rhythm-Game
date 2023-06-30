@@ -1,6 +1,7 @@
 # NES-Minesweeper
 
 A simple minesweeper game, coded in 6502 for the Nintendo Entertainment System, and assembled using the ca65 assembler.  
+Big thanks to BattleLineGames for their [NES Starter Kit](https://github.com/battlelinegames/nes-starter-kit), which I used as a template for this project!
 
 ## Description
 If you know minesweeper, you know this game!  
