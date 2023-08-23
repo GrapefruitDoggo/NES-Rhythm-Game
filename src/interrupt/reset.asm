@@ -44,15 +44,6 @@ reset:
     ;======================================================================================
 
     ; set the ppu control register to enable nmi and sprite tile rendering
-/*
-    set palette_init, #0
-    lda palette_init
-;    cmp #2
-    bne palette_loaded ; bcs palette_loaded
-        jsr load_palettes
-        inc palette_init
-    palette_loaded:
-*/
 
     jsr load_palettes
 

@@ -6,7 +6,6 @@
 ; The base 'engine' code comes from: https://github.com/battlelinegames/nes-starter-kit
 
 .linecont       +               ; Allow line continuations
-.feature        c_comments      /* allow this style of comment */
 
 ; after we load the sprites, we know that this one should always point to the player cursor's y and x position respectively, unless something has gone horribly wrong
 .define CursorY $0200
